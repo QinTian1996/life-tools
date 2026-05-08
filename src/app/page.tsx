@@ -16,6 +16,12 @@ export default function Home() {
         >
           今天吃什么
         </a>
+        <a
+          href="/chat"
+          className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+        >
+          聊天
+        </a>
       </div>
       <p className="mt-12 text-amber-400 text-sm">—— 喵十七</p>
     </main>
