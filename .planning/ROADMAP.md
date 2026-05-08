@@ -24,6 +24,12 @@ All client features depend on this API route. Establish the streaming pipeline, 
 
 **Key Pitfalls Addressed:** maxTokens limit, API key exposure, stream errors rendered as text, unbounded conversation cost, function timeout
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Install AI SDK packages + create .env.example
+- [ ] 01-02-PLAN.md — Create /api/chat route handler with POST streaming + GET health
+
 ---
 
 ## Phase 2: Chat UI + Home Page
