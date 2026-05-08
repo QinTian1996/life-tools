@@ -51,11 +51,11 @@ Build the user-facing chat experience on top of the working API route. The `useC
 
 **Components:** ChatUI, MessageList, MessageBubble, ChatInput
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 02-01-PLAN.md — Create Chat UI components (MessageBubble, MessageList, ChatInput, ChatUI, page)
-- [ ] 02-02-PLAN.md — Add "聊天" button to home page
+- [x] 02-01-PLAN.md — Create Chat UI components (MessageBubble, MessageList, ChatInput, ChatUI, page)
+- [x] 02-02-PLAN.md — Add "聊天" button to home page
 
 **Goal:** Client-side chat interface with streaming display and home page navigation.
 
