@@ -1,0 +1,22 @@
+{
+  "mode": "yolo",
+  "granularity": "standard",
+  "parallelization": true,
+  "commit_docs": true,
+  "model_profile": "balanced",
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true,
+    "nyquist_validation": true,
+    "auto_advance": false
+  },
+  "planning": {
+    "sub_repos": []
+  },
+  "project": {
+    "name": "喵十七的工具箱",
+    "path": "/home/qt/projects/life-tools",
+    "codebase_mapped": true
+  }
+}
