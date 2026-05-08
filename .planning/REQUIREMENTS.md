@@ -51,21 +51,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CHAT-01 | Phase 1 | Pending |
-| CHAT-02 | Phase 1 | Pending |
+| CHAT-01 | Phase 2 | Pending |
+| CHAT-02 | Phase 2 | Pending |
 | CHAT-03 | Phase 1 | Pending |
-| CHAT-04 | Phase 1 | Pending |
-| CHAT-05 | Phase 1 | Pending |
-| CHAT-06 | Phase 1 | Pending |
+| CHAT-04 | Phase 2 | Pending |
+| CHAT-05 | Phase 2 | Pending |
+| CHAT-06 | Phase 2 | Pending |
 | CHAT-07 | Phase 1 | Pending |
 | CHAT-08 | Phase 1 | Pending |
-| HOME-01 | Phase 1 | Pending |
+| HOME-01 | Phase 2 | Pending |
 
 **Coverage:**
 - v1 requirements: 9 total
 - Mapped to phases: 9
 - Unmapped: 0 ✓
+- Phase 1: 3 requirements (CHAT-03, CHAT-07, CHAT-08)
+- Phase 2: 6 requirements (CHAT-01, CHAT-02, CHAT-04, CHAT-05, CHAT-06, HOME-01)
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after v1.0 requirements definition*
+*Last updated: 2026-05-08 after roadmap creation*
