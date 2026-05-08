@@ -12,12 +12,12 @@ Requirements for milestone v1.0. Each maps to roadmap phases.
 
 - [ ] **CHAT-01**: User can send a message via textarea (Enter to send)
 - [ ] **CHAT-02**: User can see their messages displayed as user bubbles
-- [ ] **CHAT-03**: AI responds with streaming text (real-time token display)
+- [x] **CHAT-03**: AI responds with streaming text (real-time token display)
 - [ ] **CHAT-04**: User can see AI responses displayed as assistant bubbles
 - [ ] **CHAT-05**: Chat interface auto-scrolls to latest message
 - [ ] **CHAT-06**: Loading indicator shown while AI is responding
-- [ ] **CHAT-07**: Error message shown if API call fails
-- [ ] **CHAT-08**: `/api/chat` route proxies to DeepSeek API server-side
+- [x] **CHAT-07**: Error message shown if API call fails
+- [x] **CHAT-08**: `/api/chat` route proxies to DeepSeek API server-side
 
 ### Home Page
 
@@ -53,12 +53,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | CHAT-01 | Phase 2 | Pending |
 | CHAT-02 | Phase 2 | Pending |
-| CHAT-03 | Phase 1 | Pending |
+| CHAT-03 | Phase 1 | Complete |
 | CHAT-04 | Phase 2 | Pending |
 | CHAT-05 | Phase 2 | Pending |
 | CHAT-06 | Phase 2 | Pending |
-| CHAT-07 | Phase 1 | Pending |
-| CHAT-08 | Phase 1 | Pending |
+| CHAT-07 | Phase 1 | Complete |
+| CHAT-08 | Phase 1 | Complete |
 | HOME-01 | Phase 2 | Pending |
 
 **Coverage:**

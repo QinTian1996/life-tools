@@ -27,8 +27,8 @@ All client features depend on this API route. Establish the streaming pipeline, 
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Install AI SDK packages + create .env.example
-- [ ] 01-02-PLAN.md — Create /api/chat route handler with POST streaming + GET health
+- [x] 01-01-PLAN.md — Install AI SDK packages + create .env.example
+- [x] 01-02-PLAN.md — Create /api/chat route handler with POST streaming + GET health
 
 ---
 
