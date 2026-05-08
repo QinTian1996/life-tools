@@ -15,14 +15,13 @@ function getTextContent(message: UIMessage): string {
 
 export default function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user';
-  const isAssistant = message.role === 'assistant';
   const content = getTextContent(message);
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`max-w-[80%] px-4 py-3 rounded-lg ${
-          isAssistant
+          message.role === 'assistant'
             ? 'bg-orange-50 text-gray-800 rounded-br-none'
             : 'bg-amber-500 text-white rounded-bl-none'
         }`}

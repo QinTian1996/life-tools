@@ -69,7 +69,6 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
           40% { transform: translateY(-8px); }
         }
       `}</style>
-      <span className="animate-bounce sr-only" aria-hidden="true" />
     </div>
   );
 }

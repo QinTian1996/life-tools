@@ -1,7 +1,5 @@
 'use client';
 
-import type { UIMessage } from 'ai';
-
 interface ChatInputProps {
   input: string;
   setInput: (value: string) => void;
