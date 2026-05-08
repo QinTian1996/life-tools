@@ -7,9 +7,14 @@ export const maxDuration = 60;
 const MAX_MESSAGES = 20;
 const MAX_TOKENS = 1024;
 
-interface ChatRequest {
-  messages: Array<{ role: string; content: string }>;
-  temperature?: number;
+interface UIMessagePart {
+  type: string;
+  text?: string;
+}
+
+interface UIMessage {
+  role: string;
+  parts: UIMessagePart[];
 }
 
 function mapErrorToCode(error: unknown): { error: string; code: string } {
@@ -28,10 +33,50 @@ function mapErrorToCode(error: unknown): { error: string; code: string } {
   return { error: 'Model error', code: 'MODEL_ERROR' };
 }
 
+function toModelMessage(msg: Record<string, unknown>): { role: string; content: string } | null {
+  const role = msg.role;
+  if (typeof role !== 'string') return null;
+
+  // UIMessage format: { role, parts: [{ type: "text", text }] }
+  if (Array.isArray(msg.parts)) {
+    const textPart = msg.parts.find((p: Record<string, unknown>) => p.type === 'text');
+    const text = typeof textPart?.text === 'string' ? textPart.text : '';
+    return { role, content: text };
+  }
+
+  // ModelMessage format: { role, content: string }
+  if (typeof msg.content === 'string') {
+    return { role, content: msg.content };
+  }
+
+  return null;
+}
+
+function extractMessages(body: unknown): {
+  messages: ModelMessage[];
+  temperature?: number;
+} {
+  if (!body || typeof body !== 'object') {
+    return { messages: [] };
+  }
+
+  const obj = body as Record<string, unknown>;
+
+  // Extract raw messages from either "prompt" (AI SDK 6.x) or "messages" key
+  const rawMessages = Array.isArray(obj.prompt) ? obj.prompt : Array.isArray(obj.messages) ? obj.messages : [];
+  const temperature = typeof obj.temperature === 'number' ? obj.temperature : undefined;
+
+  const messages = (rawMessages as Record<string, unknown>[])
+    .map(toModelMessage)
+    .filter((m): m is { role: string; content: string } => m !== null);
+
+  return { messages: messages as ModelMessage[], temperature };
+}
+
 export async function POST(req: Request) {
   try {
     const body: unknown = await req.json();
-    const { messages, temperature } = body as ChatRequest;
+    const { messages, temperature } = extractMessages(body);
 
     // D-02: Strict validation - messages required and non-empty
     if (!Array.isArray(messages) || messages.length === 0) {
