@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { streamText, type ModelMessage } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 
 export const runtime = 'nodejs';
@@ -69,19 +69,19 @@ export async function POST(req: Request) {
     }
 
     // Window messages to last 20 (cost control)
-    const windowedMessages = messages.slice(-MAX_MESSAGES);
+    const windowedMessages = messages.slice(-MAX_MESSAGES) as ModelMessage[];
 
     const result = streamText({
       model: deepseek('deepseek-v4-flash'),
       messages: windowedMessages,
-      maxTokens: MAX_TOKENS,
+      maxOutputTokens: MAX_TOKENS,
       ...(temperature !== undefined && { temperature }),
     });
 
     // D-04: AI SDK standard stream protocol with onError sanitization
     return result.toUIMessageStreamResponse({
-      onError: ({ error }) => {
-        return mapErrorToCode(error);
+      onError: (error: unknown) => {
+        return mapErrorToCode(error).error;
       },
     });
   } catch {
