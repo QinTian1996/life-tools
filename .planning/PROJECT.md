@@ -10,15 +10,21 @@ A personal toolbox of random useful/digital garden tools for friends. Very casua
 
 A place to dump random tools that might be useful someday. Low commitment, high creativity. If something doesn't get finished, that's fine.
 
-## Current Milestone: v1.0 LLM Chat Entry
+## Completed Milestones
+
+### v1.0 LLM Chat Entry — COMPLETE ✓
 
 **Goal:** 在首页加一个聊天按钮（风格和 bazi、吃啥一样），点进去是简易聊天界面
 
-**Target features:**
+**Delivered:**
 - 首页增加「聊天」按钮
 - 路由：`/chat`
 - 简易聊天界面
 - DeepSeek API (`deepseek-v4-flash`) 对话
+
+**Stats:** 2 phases, 4 plans, 4 commits, 100% requirements (6/6)
+
+**Archived:** 2026-05-09
 
 ## Requirements
 
@@ -27,13 +33,10 @@ A place to dump random tools that might be useful someday. Low commitment, high 
 - ✓ Basic Next.js 16 + React 19 + Tailwind CSS 4 project structure — existing
 - ✓ Home page with navigation links — existing
 - ✓ Tailwind CSS styling system — existing
-
-### Active
-
-- [ ] **CHAT-01**: 首页增加「聊天」按钮（风格与 bazi、吃啥一致）
-- [ ] **CHAT-02**: `/chat` 路由显示简易聊天界面
-- [ ] **CHAT-03**: 调用 DeepSeek API 进行对话
-- [ ] **CHAT-04**: 支持发送消息并显示 AI 回复
+- ✓ **CHAT-01**: 首页增加「聊天」按钮（风格与 bazi、吃啥一致）— v1.0
+- ✓ **CHAT-02**: `/chat` 路由显示简易聊天界面 — v1.0
+- ✓ **CHAT-03**: 调用 DeepSeek API 进行对话 — v1.0
+- ✓ **CHAT-04**: 支持发送消息并显示 AI 回复 — v1.0
 
 ### Out of Scope
 
@@ -69,10 +72,11 @@ A place to dump random tools that might be useful someday. Low commitment, high 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Next.js App Router | Existing project, stable | — Pending |
-| Tailwind CSS 4 | Existing project, comfortable | — Pending |
-| DeepSeek LLM API | First LLM feature uses DeepSeek | — Pending |
-| DeepSeek Model: deepseek-v4-flash | Fast, cost-effective for testing | — Pending |
+| Next.js App Router | Existing project, stable | ✓ Validated in v1.0 |
+| Tailwind CSS 4 | Existing project, comfortable | ✓ Validated in v1.0 |
+| DeepSeek LLM API | First LLM feature uses DeepSeek | ✓ Validated in v1.0 |
+| DeepSeek Model: deepseek-v4-flash | Fast, cost-effective for testing | ✓ Validated in v1.0 |
+| AI SDK 6.x with useChat | Streaming UI with @ai-sdk/react | ✓ Validated in v1.0 |
 
 ## Evolution
 
@@ -92,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-08 after v1.0 milestone initialization*
+*Last updated: 2026-05-09 after v1.0 milestone completion*

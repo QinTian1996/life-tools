@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
+milestone: null
+milestone_name: null
+status: archived
 last_updated: "2026-05-09"
-last_activity: 2026-05-09 — Phase 2 plans executed (02-01 Chat UI, 02-02 Home Page)
+last_activity: 2026-05-09 — Milestone v1.0 completed and archived
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State
@@ -19,42 +19,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-08)
+See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** A place to dump random tools that might be useful someday. Low commitment, high creativity.
 
-**Current milestone:** v1.0 LLM Chat Entry — **COMPLETE**
+**Milestone v1.0:** ARCHIVED — 2 phases, 4 plans, 100% complete
+
+## Archived Milestones
+
+| Milestone | Status | Phases | Plans | Commits |
+|-----------|--------|--------|-------|---------|
+| v1.0 LLM Chat Entry | **Archived** | 2 | 4 | 712e759, 8d91da3, d06ed61, 6628d6e |
 
 ## Current Position
 
-Phase: Phase 2 (Chat UI + Home Page) — **COMPLETE**
-Plan: All 2 plans completed
-Status: PHASE_COMPLETE
-Last activity: 2026-05-09 — Phase 2 plans executed (02-01 Chat UI, 02-02 Home Page)
+No active milestone. Use `/gsd-new-milestone [name]` to start a new milestone.
 
-## Milestone Status
-
-| Milestone | Status | Phases | Progress |
-|-----------|--------|--------|----------|
-| v1.0 LLM Chat Entry | **Complete** | 2/2 | 100% |
-
-## Phase Status
-
-| Phase | Name | Status | Requirements |
-|-------|------|--------|-------------|
-| 1 | API Route + Streaming Backend | **Complete** | CHAT-03 ✓, CHAT-07 ✓, CHAT-08 ✓ |
-| 2 | Chat UI + Home Page | **Complete** | CHAT-01 ✓, CHAT-02 ✓, CHAT-04 ✓, CHAT-05 ✓, CHAT-06 ✓, HOME-01 ✓ |
-
-## Completed Plans
-
-| Plan | Summary | Commit |
-|------|---------|--------|
-| 01-01 | Installed AI SDK packages + created .env.example | 712e759 |
-| 01-02 | Created /api/chat streaming endpoint + health check | 8d91da3 |
-| 02-01 | Chat UI at /chat with streaming AI, animated dots, smart scroll | d06ed61 |
-| 02-02 | Added 聊天 button to home page | 6628d6e |
-
-## Key Decisions
+## Key Decisions (v1.0)
 
 - AI SDK 6.x uses `DefaultChatTransport` + `sendMessage()` instead of old `useChat({ api })` API
 - UIMessage uses `parts[]` array (TextUIPart) for content, not flat `content` string
@@ -65,4 +46,4 @@ Last activity: 2026-05-09 — Phase 2 plans executed (02-01 Chat UI, 02-02 Home 
 None.
 
 ---
-*State updated: 2026-05-09 after Phase 2 execution*
+*State updated: 2026-05-09 after v1.0 milestone archival*

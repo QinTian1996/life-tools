@@ -1,11 +1,15 @@
-# Roadmap: 喵十七的工具箱 v1.0
+# Roadmap: 喵十七的工具箱
 
-**Milestone:** v1.0 LLM Chat Entry
-**Created:** 2026-05-08
-**Phases:** 2
-**Total Requirements:** 9
+**Status:** v1.0 ARCHIVED (2026-05-09)
+**Active Milestone:** None
 
-## Phase 1: API Route + Streaming Backend
+---
+
+## v1.0 LLM Chat Entry — ARCHIVED
+
+**Archived:** 2026-05-09 | 2 phases, 4 plans, 4 commits
+
+### Phase 1: API Route + Streaming Backend — ARCHIVED
 
 **Goal:** Server-side DeepSeek streaming proxy with cost controls and error handling.
 
@@ -32,7 +36,7 @@ Plans:
 
 ---
 
-## Phase 2: Chat UI + Home Page
+### Phase 2: Chat UI + Home Page — ARCHIVED
 
 **Goal:** Client-side chat interface with streaming display and home page navigation.
 
@@ -76,26 +80,6 @@ Build the user-facing chat experience on top of the working API route. The `useC
 
 ---
 
-## Phase Ordering
-
-- **Phase 1 → Phase 2:** All client features require the API route. Building UI without a working endpoint means mocking and rework. Validate streaming pipeline with real DeepSeek responses before UI consumption patterns are locked in.
-
-## Requirement Coverage
-
-| Requirement | Phase | Description |
-|-------------|-------|-------------|
-| CHAT-01 | Phase 2 | Send message via textarea (Enter to send) |
-| CHAT-02 | Phase 2 | User messages displayed as user bubbles |
-| CHAT-03 | Phase 1 | AI responds with streaming text |
-| CHAT-04 | Phase 2 | AI responses displayed as assistant bubbles |
-| CHAT-05 | Phase 2 | Chat auto-scrolls to latest message |
-| CHAT-06 | Phase 2 | Loading indicator while AI responding |
-| CHAT-07 | Phase 1 | Error message if API call fails |
-| CHAT-08 | Phase 1 | `/api/chat` route proxies to DeepSeek |
-| HOME-01 | Phase 2 | Home page "聊天" button |
-
-**Coverage:** 9/9 requirements mapped (100%)
-
 ## v2 Deferred
 
 The following are documented in REQUIREMENTS.md as v2 and are NOT part of this roadmap:
@@ -107,3 +91,4 @@ The following are documented in REQUIREMENTS.md as v2 and are NOT part of this r
 
 ---
 *Roadmap created: 2026-05-08*
+*Last updated: 2026-05-09 — v1.0 archived*
