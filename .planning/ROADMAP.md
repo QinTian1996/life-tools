@@ -51,6 +51,29 @@ Build the user-facing chat experience on top of the working API route. The `useC
 
 **Components:** ChatUI, MessageList, MessageBubble, ChatInput
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Create Chat UI components (MessageBubble, MessageList, ChatInput, ChatUI, page)
+- [ ] 02-02-PLAN.md — Add "聊天" button to home page
+
+**Goal:** Client-side chat interface with streaming display and home page navigation.
+
+Build the user-facing chat experience on top of the working API route. The `useChat` hook from `@ai-sdk/react` manages message state, streaming lifecycle, and abort control. UI components are presentational Tailwind work.
+
+**Requirements:** CHAT-01, CHAT-02, CHAT-04, CHAT-05, CHAT-06, HOME-01
+
+**Stack:** `@ai-sdk/react@3` (`useChat` hook), Tailwind CSS 4, React 19
+
+**Success Criteria:**
+1. Home page displays "聊天" button styled consistently with existing "八字" and "吃啥" buttons, linking to `/chat`
+2. User types a message in textarea, presses Enter (or clicks send button), message appears immediately as user bubble
+3. AI response streams token-by-token in real-time, displayed as visually distinct assistant bubble
+4. Chat view auto-scrolls to show latest message during and after streaming
+5. Loading indicator (spinner/dots) visible while AI is generating response
+
+**Components:** ChatUI, MessageList, MessageBubble, ChatInput
+
 ---
 
 ## Phase Ordering
