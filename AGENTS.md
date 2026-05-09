@@ -42,3 +42,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - No authentication
 
 <!-- END:GSD-project-context -->
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+at `specs/001-unified-ui-framework/plan.md`.
+<!-- SPECKIT END -->

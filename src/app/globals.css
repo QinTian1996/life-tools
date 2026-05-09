@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --header-bg: #d97706;
+  --header-fg: #ffffff;
 }
 
 @theme inline {
@@ -16,6 +18,13 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --header-bg: var(--background);
+    --header-fg: var(--foreground);
+  }
+
+  /* Logo visibility in dark mode: invert orange SVG to appear light on dark bg */
+  img[src="/logo.svg"] {
+    filter: invert(1) hue-rotate(180deg);
   }
 }
 

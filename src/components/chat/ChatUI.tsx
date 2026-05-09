@@ -32,11 +32,7 @@ export default function ChatUI() {
   const displayError = error ?? localError;
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      <header className="bg-amber-600 text-white px-4 py-3 shadow-md">
-        <h1 className="text-lg font-bold">聊天</h1>
-      </header>
-
+    <div className="flex flex-col h-full">
       <MessageList messages={messages satisfies UIMessage[]} isLoading={isLoading} />
 
       <ChatInput
