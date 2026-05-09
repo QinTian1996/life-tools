@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: UI Design System & Visual Language
-status: planning
+status: roadmap-ready
 last_updated: "2026-05-09"
-last_activity: 2026-05-09 — Milestone v2.0 started
+last_activity: 2026-05-09 — Roadmap approved (4 phases)
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0

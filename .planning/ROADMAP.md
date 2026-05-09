@@ -1,94 +1,99 @@
-# Roadmap: 喵十七的工具箱
+# Roadmap: 喵十七的工具箱 v2.0
 
-**Status:** v1.0 ARCHIVED (2026-05-09)
-**Active Milestone:** None
+**Milestone:** v2.0 UI Design System & Visual Language
+**Created:** 2026-05-09
+**Phases:** 4 (continuing from v1.0 phases 1-2)
 
----
+## Phase Summary
 
-## v1.0 LLM Chat Entry — ARCHIVED
+| # | Phase | Goal | Requirements | Success Criteria |
+|---|-------|------|--------------|------------------|
+| 3 | Design Philosophy | 定义温暖极简主义的设计"魂" | DSGN-01, DSGN-02, DSGN-03 | 3 |
+| 4 | Design Tokens | 量化所有视觉规范为 tokens | TOKN-01..TOKN-06 | 4 |
+| 5 | CSS & Components | 代码落地：CSS 变量 + 组件库 | IMPL-01..IMPL-07 | 5 |
+| 6 | Page Migration | 现有页面全面改造 | MIGR-01..MIGR-04 | 4 |
 
-**Archived:** 2026-05-09 | 2 phases, 4 plans, 4 commits
+## Phase 3: Design Philosophy & Principles
 
-### Phase 1: API Route + Streaming Backend — ARCHIVED
+**Goal:** 定义"温暖极简主义"的设计理念、具体原则和反模式清单。
 
-**Goal:** Server-side DeepSeek streaming proxy with cost controls and error handling.
-
-All client features depend on this API route. Establish the streaming pipeline, security model (server-only key), and cost controls before any UI work. This phase prevents 5 of 7 critical pitfalls from reaching production.
-
-**Requirements:** CHAT-03, CHAT-07, CHAT-08
-
-**Stack:** `ai@6`, `@ai-sdk/deepseek@2`, Next.js Route Handler
-
-**Success Criteria:**
-1. POST to `/api/chat` with `{ messages: [{ role: "user", content: "Hello" }] }` returns a streaming SSE response with real-time tokens from DeepSeek `deepseek-v4-flash`
-2. API returns non-200 error response when `DEEPSEEK_API_KEY` is missing or DeepSeek API returns an error (no stack traces leaked)
-3. API enforces `maxTokens` limit (1024) to prevent unbounded generation cost
-4. Conversation history is windowed to last 20 messages to control quadratic cost growth
-5. Route Handler uses Node.js runtime (not Edge) with `maxDuration = 60` to prevent deployment timeouts
-
-**Key Pitfalls Addressed:** maxTokens limit, API key exposure, stream errors rendered as text, unbounded conversation cost, function timeout
-
-**Plans:** 2 plans
-
-Plans:
-- [x] 01-01-PLAN.md — Install AI SDK packages + create .env.example
-- [x] 01-02-PLAN.md — Create /api/chat route handler with POST streaming + GET health
-
----
-
-### Phase 2: Chat UI + Home Page — ARCHIVED
-
-**Goal:** Client-side chat interface with streaming display and home page navigation.
-
-Build the user-facing chat experience on top of the working API route. The `useChat` hook from `@ai-sdk/react` manages message state, streaming lifecycle, and abort control. UI components are presentational Tailwind work.
-
-**Requirements:** CHAT-01, CHAT-02, CHAT-04, CHAT-05, CHAT-06, HOME-01
-
-**Stack:** `@ai-sdk/react@3` (`useChat` hook), Tailwind CSS 4, React 19
+**Requirements:** DSGN-01, DSGN-02, DSGN-03
 
 **Success Criteria:**
-1. Home page displays "聊天" button styled consistently with existing "八字" and "吃啥" buttons, linking to `/chat`
-2. User types a message in textarea, presses Enter (or clicks send button), message appears immediately as user bubble
-3. AI response streams token-by-token in real-time, displayed as visually distinct assistant bubble
-4. Chat view auto-scrolls to show latest message during and after streaming
-5. Loading indicator (spinner/dots) visible while AI is generating response
+1. 理念文档不少于 5 条具体可操作的设计原则
+2. 每条原则有"做"和"不做"的示例
+3. 反模式清单覆盖至少 5 种常见错误
 
-**Components:** ChatUI, MessageList, MessageBubble, ChatInput
+## Phase 4: Design Tokens & Specifications
 
-**Plans:** 2/2 plans complete
+**Goal:** 量化所有视觉规范：色彩（亮+暗）、排版、间距、圆角阴影。
 
-Plans:
-- [x] 02-01-PLAN.md — Create Chat UI components (MessageBubble, MessageList, ChatInput, ChatUI, page)
-- [x] 02-02-PLAN.md — Add "聊天" button to home page
-
-**Goal:** Client-side chat interface with streaming display and home page navigation.
-
-Build the user-facing chat experience on top of the working API route. The `useChat` hook from `@ai-sdk/react` manages message state, streaming lifecycle, and abort control. UI components are presentational Tailwind work.
-
-**Requirements:** CHAT-01, CHAT-02, CHAT-04, CHAT-05, CHAT-06, HOME-01
-
-**Stack:** `@ai-sdk/react@3` (`useChat` hook), Tailwind CSS 4, React 19
+**Requirements:** TOKN-01..TOKN-06
 
 **Success Criteria:**
-1. Home page displays "聊天" button styled consistently with existing "八字" and "吃啥" buttons, linking to `/chat`
-2. User types a message in textarea, presses Enter (or clicks send button), message appears immediately as user bubble
-3. AI response streams token-by-token in real-time, displayed as visually distinct assistant bubble
-4. Chat view auto-scrolls to show latest message during and after streaming
-5. Loading indicator (spinner/dots) visible while AI is generating response
+1. 亮色模式 5+ 语义色 + 2 功能色
+2. 暗色背景非纯黑，品牌栏为半透明暖色
+3. 排版 7+ 级字号，间距基于 8px 节奏
+4. text/bg 组合满足 WCAG AA 4.5:1
 
-**Components:** ChatUI, MessageList, MessageBubble, ChatInput
+## Phase 5: CSS Implementation & Component Library
+
+**Goal:** 代码落地：重写 globals.css，建立 Button/Card/Badge/Input 组件库。
+
+**Requirements:** IMPL-01..IMPL-07
+
+**Success Criteria:**
+1. globals.css 用 @theme + @variant dark { } 管理亮/暗模式
+2. 品牌栏暗色下为半透明暖色 + backdrop-filter
+3. Button 3 variants (primary/secondary/ghost)，所有状态完整
+4. Card/Input 组件统一外观 + focus ring
+5. build 通过，无 TS 错误
+
+## Phase 6: Page Migration & Verification
+
+**Goal:** 首页和聊天页改造为新设计系统，亮/暗模式验证。
+
+**Requirements:** MIGR-01..MIGR-04
+
+**Success Criteria:**
+1. 首页和聊天页使用新组件和 token
+2. 亮色模式视觉一致
+3. 暗色模式品牌栏为暖色，文字可读
+4. 聊天功能不受影响，build 通过
+
+## Dependency Graph
+
+```
+Phase 3 → Phase 4 → Phase 5 → Phase 6
+(理念)    (tokens)  (CSS+组件) (迁移)
+```
+
+## Requirement Coverage
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| DSGN-01 | 3 | Pending |
+| DSGN-02 | 3 | Pending |
+| DSGN-03 | 3 | Pending |
+| TOKN-01 | 4 | Pending |
+| TOKN-02 | 4 | Pending |
+| TOKN-03 | 4 | Pending |
+| TOKN-04 | 4 | Pending |
+| TOKN-05 | 4 | Pending |
+| TOKN-06 | 4 | Pending |
+| IMPL-01 | 5 | Pending |
+| IMPL-02 | 5 | Pending |
+| IMPL-03 | 5 | Pending |
+| IMPL-04 | 5 | Pending |
+| IMPL-05 | 5 | Pending |
+| IMPL-06 | 5 | Pending |
+| IMPL-07 | 5 | Pending |
+| MIGR-01 | 6 | Pending |
+| MIGR-02 | 6 | Pending |
+| MIGR-03 | 6 | Pending |
+| MIGR-04 | 6 | Pending |
+
+**Coverage:** 20/20 mapped ✓
 
 ---
-
-## v2 Deferred
-
-The following are documented in REQUIREMENTS.md as v2 and are NOT part of this roadmap:
-- CHAT-09: Markdown rendering
-- CHAT-10: Copy message button
-- CHAT-11: Clear conversation button
-- CHAT-12: Empty state / welcome message
-- CHAT-13: Stop generation button
-
----
-*Roadmap created: 2026-05-08*
-*Last updated: 2026-05-09 — v1.0 archived*
+*Roadmap created: 2026-05-09*
