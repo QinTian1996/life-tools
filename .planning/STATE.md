@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: archived
+milestone: v2.0
+milestone_name: UI Design System & Visual Language
+status: planning
 last_updated: "2026-05-09"
-last_activity: 2026-05-09 — Milestone v1.0 completed and archived
+last_activity: 2026-05-09 — Milestone v2.0 started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -23,7 +23,7 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** A place to dump random tools that might be useful someday. Low commitment, high creativity.
 
-**Milestone v1.0:** ARCHIVED — 2 phases, 4 plans, 100% complete
+**Milestone v2.0:** PLANNING — Design system & visual language definition
 
 ## Archived Milestones
 
@@ -33,7 +33,10 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 ## Current Position
 
-No active milestone. Use `/gsd-new-milestone [name]` to start a new milestone.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-09 — Milestone v2.0 started
 
 ## Key Decisions (v1.0)
 
@@ -46,4 +49,4 @@ No active milestone. Use `/gsd-new-milestone [name]` to start a new milestone.
 None.
 
 ---
-*State updated: 2026-05-09 after v1.0 milestone archival*
+*State updated: 2026-05-09 after v2.0 milestone initialization*
