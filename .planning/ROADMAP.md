@@ -65,7 +65,7 @@
 
 Plans:
 - [ ] 06-01-PLAN.md — PageLayout + Home page migration
-- [ ] 06-02-PLAN.md — Chat components migration (MessageBubble, ChatInput, MessageList)
+- [x] 06-02-PLAN.md — Chat components migration (MessageBubble, ChatInput, MessageList) [dd90db2]
 - [ ] 06-03-PLAN.md — Verification (build + visual checklist)
 
 ## Dependency Graph

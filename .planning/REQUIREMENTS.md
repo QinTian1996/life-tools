@@ -34,7 +34,7 @@
 ### Layer 4: Page Migration (应用/改造)
 
 - [ ] **MIGR-01**: 改造首页 (`src/app/page.tsx`) — 首页内容遵循新设计 token，使用新组件（Button、Card）
-- [ ] **MIGR-02**: 改造聊天页 (`src/components/chat/`) — 聊天组件遵循新设计 token，输入框/按钮使用新组件
+- [x] **MIGR-02**: 改造聊天页 (`src/components/chat/`) — 聊天组件遵循新设计 token，输入框/按钮使用新组件
 - [ ] **MIGR-03**: 验证亮色模式 — 首页和聊天页在亮色模式下视觉一致，token 正确应用
 - [ ] **MIGR-04**: 验证暗色模式 — 品牌栏为暖色而非纯黑，所有页面在暗色下可读，token 正确切换
 
@@ -80,7 +80,7 @@ Requirements from v1.0 that have shipped and remain valid:
 | IMPL-06 | — | Pending |
 | IMPL-07 | — | Pending |
 | MIGR-01 | — | Pending |
-| MIGR-02 | — | Pending |
+| MIGR-02 | 06-02 | Complete |
 | MIGR-03 | — | Pending |
 | MIGR-04 | — | Pending |
 
