@@ -61,6 +61,13 @@
 3. 暗色模式品牌栏为暖色，文字可读
 4. 聊天功能不受影响，build 通过
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — PageLayout + Home page migration
+- [ ] 06-02-PLAN.md — Chat components migration (MessageBubble, ChatInput, MessageList)
+- [ ] 06-03-PLAN.md — Verification (build + visual checklist)
+
 ## Dependency Graph
 
 ```
