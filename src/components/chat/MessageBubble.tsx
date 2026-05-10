@@ -22,8 +22,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
       <div
         className={`max-w-[80%] px-4 py-3 rounded-lg ${
           message.role === 'assistant'
-            ? 'bg-orange-50 text-gray-800 rounded-br-none'
-            : 'bg-amber-500 text-white rounded-bl-none'
+            ? 'bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-br-none'
+            : 'bg-[var(--primary)] text-[var(--primary-foreground)] rounded-bl-none'
         }`}
       >
         <p className="whitespace-pre-wrap break-words">{content}</p>

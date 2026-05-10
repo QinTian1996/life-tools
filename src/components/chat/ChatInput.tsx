@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from "@/components/ui/Button";
+
 interface ChatInputProps {
   input: string;
   setInput: (value: string) => void;
@@ -33,8 +35,8 @@ export default function ChatInput({
   return (
     <div className="border-t border-gray-100 p-4 bg-white">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-2 text-sm">
-          {error.message || '发生错误，请重试'}
+        <div className="bg-[var(--destructive)] text-[var(--destructive-foreground)] border border-[var(--destructive)] px-4 py-2 rounded-lg mb-2 text-sm">
+          {error.message || '发送失败，请重试'}
         </div>
       )}
 
@@ -44,17 +46,18 @@ export default function ChatInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="输入消息..."
-          className="flex-1 border border-gray-200 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-800"
+          className="flex-1 border border-[var(--input)] rounded-[var(--radius-md)] px-4 py-3 resize-none focus:outline-none focus:border-[var(--ring)] focus:ring-2 focus:ring-[var(--ring)] text-[var(--foreground)] bg-transparent"
           rows={1}
           disabled={isLoading}
         />
-        <button
+        <Button
           onClick={handleSend}
           disabled={isLoading || !input.trim()}
-          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white rounded-lg font-medium transition-colors"
+          variant="primary"
+          size="default"
         >
           发送
-        </button>
+        </Button>
       </div>
     </div>
   );

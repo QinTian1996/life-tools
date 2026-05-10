@@ -42,21 +42,21 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
                   animation: 'bounce 1.4s infinite ease-in-out both',
                   animationDelay: '0s',
                 }}
-                className="inline-block w-2 h-2 bg-amber-600 rounded-full"
+                className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full"
               />
               <span
                 style={{
                   animation: 'bounce 1.4s infinite ease-in-out both',
                   animationDelay: '0.16s',
                 }}
-                className="inline-block w-2 h-2 bg-amber-600 rounded-full"
+                className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full"
               />
               <span
                 style={{
                   animation: 'bounce 1.4s infinite ease-in-out both',
                   animationDelay: '0.32s',
                 }}
-                className="inline-block w-2 h-2 bg-amber-600 rounded-full"
+                className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full"
               />
             </div>
           </div>
