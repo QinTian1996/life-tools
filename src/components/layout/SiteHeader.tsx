@@ -20,7 +20,7 @@ export default function SiteHeader({ title }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-10 bg-[var(--header-bg)] text-[var(--header-fg)]">
+      <header data-site-header className="fixed top-0 left-0 right-0 z-10 bg-[var(--header-bg)] text-[var(--header-fg)]">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
             {isHome ? (

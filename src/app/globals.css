@@ -1,35 +1,136 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --header-bg: #d97706;
-  --header-fg: #ffffff;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
+/* ===== DESIGN TOKENS ===== */
+@theme {
+  /* Fonts */
+  --font-brand: "LXGW WenKai", system-ui, sans-serif;
+  --font-mono: "Sarasa Mono SC", var(--font-sarasa-mono), ui-monospace, monospace;
+
+  /* Semantic colors — mapped to CSS variables */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  /* Primitive colors (raw oklch values) */
+  --color-amber-50: oklch(0.98 0.02 85);
+  --color-amber-100: oklch(0.95 0.04 85);
+  --color-amber-200: oklch(0.90 0.08 85);
+  --color-amber-300: oklch(0.85 0.12 85);
+  --color-amber-400: oklch(0.80 0.16 85);
+  --color-amber-500: oklch(0.72 0.18 85);
+  --color-amber-600: oklch(0.60 0.15 85);
+  --color-amber-700: oklch(0.50 0.12 85);
+  --color-amber-800: oklch(0.40 0.08 85);
+  --color-amber-900: oklch(0.30 0.05 85);
+
+  --color-warm-stone-50: oklch(0.98 0.01 50);
+  --color-warm-stone-100: oklch(0.96 0.01 50);
+  --color-warm-stone-200: oklch(0.92 0.02 50);
+  --color-warm-stone-300: oklch(0.85 0.03 50);
+  --color-warm-stone-400: oklch(0.70 0.02 50);
+  --color-warm-stone-500: oklch(0.55 0.02 50);
+  --color-warm-stone-600: oklch(0.42 0.02 50);
+  --color-warm-stone-700: oklch(0.35 0.02 50);
+  --color-warm-stone-800: oklch(0.25 0.01 50);
+  --color-warm-stone-900: oklch(0.18 0.01 50);
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px oklch(0.15 0.01 50 / 0.05);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --header-bg: var(--background);
-    --header-fg: var(--foreground);
-  }
+/* ===== LIGHT MODE ===== */
+:root {
+  --background: oklch(0.98 0.01 50);
+  --foreground: oklch(0.18 0.01 50);
+  --primary: oklch(0.72 0.18 85);
+  --primary-foreground: oklch(0.98 0.01 50);
+  --secondary: oklch(0.96 0.01 50);
+  --secondary-foreground: oklch(0.35 0.02 50);
+  --muted: oklch(0.96 0.01 50);
+  --muted-foreground: oklch(0.55 0.02 50);
+  --accent: oklch(0.80 0.16 85);
+  --accent-foreground: oklch(0.18 0.01 50);
+  --card: oklch(0.98 0.01 50);
+  --card-foreground: oklch(0.18 0.01 50);
+  --border: oklch(0.92 0.02 50);
+  --input: oklch(0.92 0.02 50);
+  --ring: oklch(0.80 0.16 85);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0.01 50);
+  --success: oklch(0.50 0.15 145);
+  --success-foreground: oklch(0.98 0.01 50);
 
-  /* Logo visibility in dark mode: invert orange SVG to appear light on dark bg */
-  img[src="/logo.svg"] {
-    filter: invert(1) hue-rotate(180deg);
-  }
+  /* Brand bar (light) */
+  --header-bg: oklch(0.72 0.18 85);
+  --header-fg: oklch(0.98 0.01 50);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===== DARK MODE ===== */
+@variant dark {
+  --background: oklch(0.18 0.01 50);
+  --foreground: oklch(0.96 0.01 50);
+  --primary: oklch(0.80 0.16 85);
+  --primary-foreground: oklch(0.18 0.01 50);
+  --secondary: oklch(0.25 0.01 50);
+  --secondary-foreground: oklch(0.85 0.03 50);
+  --muted: oklch(0.25 0.01 50);
+  --muted-foreground: oklch(0.70 0.02 50);
+  --accent: oklch(0.72 0.18 85);
+  --accent-foreground: oklch(0.96 0.01 50);
+  --card: oklch(0.25 0.01 50);
+  --card-foreground: oklch(0.96 0.01 50);
+  --border: oklch(0.35 0.02 50);
+  --input: oklch(0.35 0.02 50);
+  --ring: oklch(0.80 0.16 85);
+  --destructive: oklch(0.65 0.18 25);
+  --destructive-foreground: oklch(0.98 0.01 50);
+  --success: oklch(0.60 0.12 145);
+  --success-foreground: oklch(0.98 0.01 50);
+
+  /* Brand bar (dark) — semi-transparent warm + glass */
+  --header-bg: rgba(28, 25, 23, 0.85);
+  --header-fg: oklch(0.96 0.01 50);
+}
+
+/* ===== BRAND BAR BACKDROP ===== */
+header[data-site-header] {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-brand);
+  }
 }
