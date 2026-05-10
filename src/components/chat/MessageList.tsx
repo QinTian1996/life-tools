@@ -36,7 +36,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-orange-50 rounded-lg rounded-br-none px-4 py-3 flex gap-2 items-center">
+            <div className="bg-[var(--secondary)] rounded-lg rounded-br-none px-4 py-3 flex gap-2 items-center">
               <span
                 style={{
                   animation: 'bounce 1.4s infinite ease-in-out both',

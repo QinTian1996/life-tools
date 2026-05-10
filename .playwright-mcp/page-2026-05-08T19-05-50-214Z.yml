@@ -1,0 +1,13 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "聊天" [level=1] [ref=e4]
+    - generic [ref=e20]:
+      - paragraph [ref=e23]: hi
+      - paragraph [ref=e26]: 你好！😊 很高兴见到你。我是 DeepSeek，随时准备帮你解答问题、提供建议或者陪你聊天。有什么我可以帮你的吗？无论是学习、工作还是生活中的疑问，尽管说吧！
+    - generic [ref=e7]:
+      - textbox "输入消息..." [ref=e8]
+      - button "发送" [disabled] [ref=e9]
+  - button "Open Next.js Dev Tools" [ref=e15] [cursor=pointer]:
+    - img [ref=e16]
+  - alert [ref=e19]

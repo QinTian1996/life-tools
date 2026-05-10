@@ -1,0 +1,6 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - heading "聊天" [level=1] [ref=e4]
+  - generic [ref=e7]:
+    - textbox "输入消息..." [ref=e8]
+    - button "发送" [disabled] [ref=e9]
