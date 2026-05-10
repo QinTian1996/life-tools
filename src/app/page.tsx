@@ -1,33 +1,25 @@
 import Link from 'next/link';
+import { Button } from "@/components/ui/Button";
 import PageLayout from '@/components/layout/PageLayout';
 
 export default function Home() {
   return (
     <PageLayout>
       <div className="flex-1 flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold text-amber-900 mb-4">喵十七的工具箱 🔧</h1>
-        <p className="text-amber-700 text-lg mb-8">给朋友们的小玩意儿们</p>
+        <h1 className="text-3xl font-[family-name:var(--font-brand)] font-semibold text-[var(--foreground)] mb-4">喵十七的工具箱 🔧</h1>
+        <p className="text-[var(--muted-foreground)] text-lg mb-8">给朋友们的小玩意儿们</p>
         <div className="flex gap-4">
-          <Link
-            href="/bazi"
-            className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-          >
-            算八字
-          </Link>
-          <Link
-            href="/eat"
-            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            今天吃什么
-          </Link>
-          <Link
-            href="/chat"
-            className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-          >
-            聊天
-          </Link>
+          <Button asChild variant="primary" size="default">
+            <Link href="/bazi">算八字</Link>
+          </Button>
+          <Button asChild variant="secondary" size="default">
+            <Link href="/eat">今天吃什么</Link>
+          </Button>
+          <Button asChild variant="primary" size="default">
+            <Link href="/chat">聊天</Link>
+          </Button>
         </div>
-        <p className="mt-12 text-amber-400 text-sm">&mdash;&mdash; 喵十七</p>
+        <p className="mt-12 text-[var(--muted-foreground)] text-sm">&mdash;&mdash; 喵十七</p>
       </div>
     </PageLayout>
   );
