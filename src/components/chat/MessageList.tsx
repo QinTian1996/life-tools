@@ -12,6 +12,7 @@ interface MessageListProps {
 export default function MessageList({ messages, isLoading }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);
+  const skipScrollEvent = useRef(false);
 
   const distFromBottom = () => {
     const el = containerRef.current;
@@ -22,6 +23,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
   const scrollToBottom = (smooth: boolean) => {
     const el = containerRef.current;
     if (!el) return;
+    skipScrollEvent.current = true;
     el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
   };
 
@@ -40,15 +42,17 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
     if (messages.length > 0 && distFromBottom() <= 200) {
       pinned.current = true;
     }
-    if (pinned.current) {
-      scrollToBottom(true);
-    }
+    scrollToBottom(true);
   }, [messages.length]);
 
   return (
     <div
       ref={containerRef}
       onScroll={() => {
+        if (skipScrollEvent.current) {
+          skipScrollEvent.current = false;
+          return;
+        }
         const d = distFromBottom();
         if (d > 50) pinned.current = false;
         else if (d === 0) pinned.current = true;
