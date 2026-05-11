@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/Button";
 import PageLayout from '@/components/layout/PageLayout';
 
+const COMMIT = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7);
+
 export default function Home() {
   return (
     <PageLayout>
@@ -21,6 +23,11 @@ export default function Home() {
         </div>
         <p className="mt-12 text-[var(--muted-foreground)] text-sm">&mdash;&mdash; 喵十七</p>
       </div>
+      {COMMIT && (
+        <p className="fixed bottom-2 right-3 text-[var(--muted-foreground)] text-xs opacity-40 select-none font-mono">
+          {COMMIT}
+        </p>
+      )}
     </PageLayout>
   );
 }
