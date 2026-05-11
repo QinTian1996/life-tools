@@ -56,10 +56,18 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
     };
 
     if (timeMode === "precise") {
-      input.hour = parseInt(hour);
-      input.minute = parseInt(minute);
+      if (hour === "unknown") {
+        input.timeMode = "unknown";
+      } else {
+        input.hour = parseInt(hour);
+        input.minute = parseInt(minute);
+      }
     } else if (timeMode === "shichen") {
-      input.shichen = shichen;
+      if (shichen === "unknown") {
+        input.timeMode = "unknown";
+      } else {
+        input.shichen = shichen;
+      }
     }
 
     onCalculate(input);
@@ -154,6 +162,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
                 const m = i % 2 === 0 ? "00" : "30";
                 return <option key={`${h}:${m}`} value={`${h}:${m}`}>{h}:{m}</option>;
               })}
+              <option value="unknown">不知道</option>
             </select>
           </div>
         )}
@@ -167,6 +176,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
               className="w-full h-10 px-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] text-sm"
             >
               {SHICHEN_OPTIONS.map((s) => (<option key={s} value={s}>{s}时</option>))}
+              <option value="unknown">不知道</option>
             </select>
           </div>
         )}
@@ -226,7 +236,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
         </div>
 
         <div className="flex items-center rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden">
-          {(["precise", "shichen", "unknown"] as TimeMode[]).map((mode) => (
+          {(["precise", "shichen"] as TimeMode[]).map((mode) => (
             <button
               key={mode}
               type="button"
@@ -234,10 +244,10 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 timeMode === mode
                   ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                  : "bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--secondary)]"
+                  : "bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
               }`}
             >
-              {mode === "precise" ? "精确时间" : mode === "shichen" ? "时辰" : "不知道"}
+              {mode === "precise" ? "时间" : "时辰"}
             </button>
           ))}
         </div>
