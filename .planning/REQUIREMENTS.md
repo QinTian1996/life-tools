@@ -54,27 +54,27 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BZ-01 | — | Pending |
-| BZ-02 | — | Pending |
-| BZ-03 | — | Pending |
-| BZ-04 | — | Pending |
-| BZ-05 | — | Pending |
-| BZ-06 | — | Pending |
-| BZ-07 | — | Pending |
-| BZ-08 | — | Pending |
-| BZ-09 | — | Pending |
-| BZ-10 | — | Pending |
-| BZ-11 | — | Pending |
-| BZ-12 | — | Pending |
-| BZ-13 | — | Pending |
-| BZ-14 | — | Pending |
-| BZ-15 | — | Pending |
-| BZ-16 | — | Pending |
-| BZ-17 | — | Pending |
+| BZ-01 | Phase 7 | Pending |
+| BZ-02 | Phase 7 | Pending |
+| BZ-03 | Phase 7 | Pending |
+| BZ-04 | Phase 8 | Pending |
+| BZ-05 | Phase 8 | Pending |
+| BZ-06 | Phase 7 | Pending |
+| BZ-07 | Phase 7 | Pending |
+| BZ-08 | Phase 7 | Pending |
+| BZ-09 | Phase 9 | Pending |
+| BZ-10 | Phase 9 | Pending |
+| BZ-11 | Phase 9 | Pending |
+| BZ-12 | Phase 9 | Pending |
+| BZ-13 | Phase 9 | Pending |
+| BZ-14 | Phase 10 | Pending |
+| BZ-15 | Phase 10 | Pending |
+| BZ-16 | Phase 9 | Pending |
+| BZ-17 | Phase 9 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 18 total
-- Mapped to phases: 0 (pending roadmap)
+- v3.0 requirements: 17 total
+- Mapped to phases: 17/17 ✓
 
 ---
 *Requirements defined: 2026-05-11*
