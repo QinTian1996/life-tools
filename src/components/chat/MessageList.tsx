@@ -38,11 +38,18 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
     return () => cancelAnimationFrame(raf);
   }, [isLoading]);
 
+  const prevLength = useRef(0);
+
   useEffect(() => {
-    if (messages.length > 0 && distFromBottom() <= 200) {
+    const isNewMessage = messages.length > prevLength.current;
+    prevLength.current = messages.length;
+
+    if (isNewMessage && distFromBottom() <= 200) {
       pinned.current = true;
     }
-    scrollToBottom(true);
+    if (pinned.current) {
+      scrollToBottom(false);
+    }
   }, [messages.length]);
 
   return (
