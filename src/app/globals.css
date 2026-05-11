@@ -127,6 +127,9 @@ header[data-site-header] {
 
 /* ===== BASE STYLES ===== */
 @layer base {
+  html {
+    font-size: 125%;
+  }
   * {
     border-color: var(--border);
   }
