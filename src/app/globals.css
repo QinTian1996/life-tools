@@ -1,12 +1,33 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular/result.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-light/result.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold/result.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ===== DESIGN TOKENS ===== */
 @theme {
-  /* Fonts */
   --font-brand: "LXGW WenKai", system-ui, sans-serif;
-  --font-mono: "Sarasa Mono SC", var(--font-sarasa-mono), ui-monospace, monospace;
+  --font-mono: "Sarasa Mono SC", ui-monospace, monospace;
 
   /* Semantic colors — mapped to CSS variables */
   --color-background: var(--background);
