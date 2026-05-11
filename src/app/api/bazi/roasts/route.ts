@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { defaultModel } from '@/lib/llm';
+import { dsV4Flash } from '@/lib/llm';
 import type { BirthInput } from '@/lib/bazi/types';
 import fs from 'fs';
 import path from 'path';
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       .replace('{name}', body.name || '当事人');
 
     const { text } = await generateText({
-      model: defaultModel,
+      model: dsV4Flash,
       prompt,
       maxOutputTokens: 1000,
     });

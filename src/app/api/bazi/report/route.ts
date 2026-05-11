@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { defaultModel } from '@/lib/llm';
+import { dsV4Flash } from '@/lib/llm';
 import type { BirthInput } from '@/lib/bazi/types';
 import fs from 'fs';
 import path from 'path';
@@ -41,7 +41,7 @@ async function generateReport(promptFile: string, fourPillarsText: string, input
     .replace('{name}', input.name || '当事人');
 
   const { text } = await generateText({
-    model: defaultModel,
+    model: dsV4Flash,
     prompt: filledPrompt,
     maxOutputTokens: 8000,
   });

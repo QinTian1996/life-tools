@@ -162,22 +162,11 @@ export default function BaziPage() {
           )}
 
           {state === 'done' && report && currentInput && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <button
-                  onClick={handleReset}
-                  className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] underline"
-                >
-                  ← 重新排盘
-                </button>
-              </div>
-
-              <BaziReport
-                professional={report.professional}
-                detailed={report.detailed}
-                inputName={currentInput.name}
-              />
-            </div>
+            <BaziReport
+              professional={report.professional}
+              detailed={report.detailed}
+              inputName={currentInput.name}
+            />
           )}
         </div>
       </div>
