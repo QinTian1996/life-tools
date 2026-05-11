@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { dsV4Flash } from '@/lib/llm';
+import { dsV4Pro } from '@/lib/llm';
 import type { BirthInput } from '@/lib/bazi/types';
 import fs from 'fs';
 import path from 'path';
@@ -41,9 +41,12 @@ async function generateReport(promptFile: string, fourPillarsText: string, input
     .replace('{name}', input.name || '当事人');
 
   const { text } = await generateText({
-    model: dsV4Flash,
+    model: dsV4Pro,
     prompt: filledPrompt,
     maxOutputTokens: 8000,
+    providerOptions: {
+      deepseek: { thinking: { type: 'enabled', budgetTokens: 12000 } },
+    },
   });
 
   return text.trim();
