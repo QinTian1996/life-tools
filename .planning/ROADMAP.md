@@ -119,8 +119,8 @@
 ✓ All 18 v3.0 requirements mapped (BZ-01 through BZ-18, including BZ-18)
 ✓ No orphaned requirements
 ✓ Phases derived from requirements (not imposed)
-✓ Granularity: standard (4 phases for 17 requirements)
+✓ Granularity: standard (4 phases for 18 requirements)
 
 ---
 
-*Roadmap updated: 2026-05-11 after v3.0 roadmap creation*
+*Roadmap updated: 2026-05-11 — Added BZ-18 (basic /bazi page scaffold) to Phase 7*

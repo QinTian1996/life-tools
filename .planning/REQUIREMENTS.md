@@ -14,6 +14,7 @@
 - [ ] **BZ-04**: 性别必选（男女）
 - [ ] **BZ-05**: 姓名选填，留空时 LLM 生成"〈形容词〉的〈动物〉"格式名
 - [ ] **BZ-06**: 首页"算八字"按钮链接到 `/bazi`
+- [ ] **BZ-18**: 创建 `/bazi` 页面骨架（PageLayout 包裹）
 
 ### Bazi Computation (八字排盘)
 
@@ -71,11 +72,12 @@
 | BZ-15 | Phase 10 | Pending |
 | BZ-16 | Phase 9 | Pending |
 | BZ-17 | Phase 9 | Pending |
+| BZ-18 | Phase 7 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 17 total
-- Mapped to phases: 17/17 ✓
+- v3.0 requirements: 18 total
+- Mapped to phases: 18/18 ✓
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-11 after initial definition*
+*Last updated: 2026-05-11 — Added BZ-18 (basic /bazi page scaffold) to Phase 7*
