@@ -10,4 +10,4 @@ export const minimax = minimaxProvider('MiniMax-M2.7-highspeed');
 export const dsV4Flash = deepseek('deepseek-v4-flash');
 export const dsV4Pro = deepseek('deepseek-v4-pro');
 
-export const defaultModel = minimax;
+export const defaultModel = dsV4Flash;
