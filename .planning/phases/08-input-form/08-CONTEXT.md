@@ -56,6 +56,14 @@ Extract Phase 7's inline test form into `src/components/bazi/BaziForm.tsx`, add 
 - **D-08:** Name input placeholder text: "留空将自动生成"
 - **D-09:** Name value is stored in `BirthInput.name` — if empty string, downstream Phase 9 LLM will generate a name
 
+### Form Layout
+
+- **D-10:** Form uses two-row compact layout:
+  - Row 1 (numeric): year / month / day inputs + gender select + 排盘 button
+  - Row 2 (toggles): 公历↔农历 toggle + time mode toggle (精确/时辰/不知道)
+  - Name field: below rows
+  - Goal: minimize form height so result area is visible without scrolling
+
 ### the agent's Discretion
 
 The following are left to the planner and researcher:
