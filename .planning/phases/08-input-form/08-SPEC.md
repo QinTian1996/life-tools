@@ -1,8 +1,8 @@
 # Phase 8: Input Form — Specification
 
-**Created:** 2026-05-11
-**Ambiguity score:** 0.13 (gate: ≤ 0.20)
-**Requirements:** 4 locked
+**Created:** 2026-05-11 (updated 2026-05-11)
+**Ambiguity score:** 0.10 (gate: ≤ 0.20)
+**Requirements:** 5 locked
 
 ## Goal
 
@@ -30,9 +30,14 @@ Phase 7 built the Bazi library functions (`src/lib/bazi/*`) and a `/bazi` page w
    - Acceptance: Button stays disabled when gender is unselected; button enables when gender chosen; name field accepts free text or empty
 
 4. **Full field validation**: Form validates all inputs before enabling submission.
-   - Current: No validation — button always enabled after gender selection
-   - Target: All required fields validated: year (1900-2100), month (1-12, or 1-12 with leap for lunar), day (1-31, validated against month), gender (required). 排盘 button disabled until all valid
-   - Acceptance: Invalid date (e.g., Feb 30) → button disabled; valid date + gender → button enabled; year outside 1900-2100 → button disabled
+    - Current: No validation — button always enabled after gender selection
+    - Target: All required fields validated: year (1900-2100), month (1-12, or 1-12 with leap for lunar), day (1-31, validated against month), gender (required). 排盘 button disabled until all valid
+    - Acceptance: Invalid date (e.g., Feb 30) → button disabled; valid date + gender → button enabled; year outside 1900-2100 → button disabled
+
+5. **Two-row compact layout**: Form uses two rows — numeric inputs on top, format toggles below.
+    - Current: Inline test form has no explicit row structure
+    - Target: Row 1: year/month/day inputs + gender + 排盘 button. Row 2: 公历/农历 toggle + 时间精确/时辰/不知道 toggle. Name field below rows. Overall form height minimized — not a tall stacked form.
+    - Acceptance: Form renders as two distinct rows; toggles are on the second row; form height is compact enough to not push the result area off-screen
 
 ## Boundaries
 
@@ -70,6 +75,7 @@ Phase 7 built the Bazi library functions (`src/lib/bazi/*`) and a `/bazi` page w
 - [ ] 排盘 button disabled when date fields empty or invalid
 - [ ] 排盘 button enabled when all fields valid (year/month/day in range + gender selected)
 - [ ] Name field accepts empty value and shows placeholder
+- [ ] Form renders as two rows (numeric inputs top, toggles bottom) with compact height
 - [ ] 排盘 button click still calls Phase 7 functions and displays results
 - [ ] `npm run build` passes with zero TypeScript errors
 
@@ -77,11 +83,11 @@ Phase 7 built the Bazi library functions (`src/lib/bazi/*`) and a `/bazi` page w
 
 | Dimension          | Score | Min  | Status | Notes                              |
 |--------------------|-------|------|--------|------------------------------------|
-| Goal Clarity       | 0.95  | 0.75 | ✓      | Extract component + validation     |
-| Boundary Clarity   | 0.85  | 0.70 | ✓      | Explicit scope: form only, no API  |
-| Constraint Clarity | 0.80  | 0.65 | ✓      | Reuse Phase 7 types + components   |
-| Acceptance Criteria| 0.85  | 0.70 | ✓      | 9 pass/fail checks                 |
-| **Ambiguity**      | 0.13  | ≤0.20| ✓      |                                    |
+| Goal Clarity       | 0.95  | 0.75 | ✓      | Extract component + validation + layout   |
+| Boundary Clarity   | 0.90  | 0.70 | ✓      | Explicit scope: form only, no API        |
+| Constraint Clarity | 0.85  | 0.65 | ✓      | Reuse Phase 7 types + two-row layout     |
+| Acceptance Criteria| 0.90  | 0.70 | ✓      | 10 pass/fail checks                      |
+| **Ambiguity**      | 0.10  | ≤0.20| ✓      |                                          |
 
 ## Interview Log
 
@@ -91,6 +97,7 @@ Phase 7 built the Bazi library functions (`src/lib/bazi/*`) and a `/bazi` page w
 | 1     | Researcher  | Validation scope?                     | Required fields + range only            |
 | 2     | Simplifier  | Keep 排盘 button + results?           | Yes, keep functional from Phase 7       |
 | 2     | Simplifier  | Lunar calendar toggle?                | Yes, date supports 公历/农历 switch     |
+| 3     | UI          | Form layout?                          | Two rows: numeric top, toggles bottom   |
 
 ---
 *Phase: 08-input-form*
