@@ -33,26 +33,6 @@ function buildFourPillarsText(bazi: {
 十神：年干${bazi.shiShen.yearStem}、月干${bazi.shiShen.monthStem}、日干${bazi.shiShen.dayStem}、时干${bazi.shiShen.hourStem}`;
 }
 
-const reportSchema = z.object({ content: z.string() });
-
-async function generateReport(input: BirthInput, fourPillarsText: string, promptFile: string): Promise<string> {
-  const prompt = fs.readFileSync(
-    path.join(process.cwd(), 'src/lib/bazi/prompts', promptFile), 'utf-8'
-  );
-  const filledPrompt = prompt.replace('{fourPillars}', fourPillarsText)
-    .replace('{gender}', input.gender === 'male' ? '男' : '女')
-    .replace('{name}', input.name || '当事人');
-
-  const { object } = await generateObject({
-    model: deepseek('deepseek-v4-flash'),
-    prompt: filledPrompt,
-    schema: reportSchema,
-    maxOutputTokens: 8000,
-  });
-
-  return object.content;
-}
-
 export async function POST(req: Request) {
   try {
     const body = await req.json() as BirthInput;
@@ -64,12 +44,24 @@ export async function POST(req: Request) {
     const baziResult = computeBazi(body);
     const fourPillarsText = buildFourPillarsText(baziResult);
 
-    const [professional, detailed] = await Promise.all([
-      generateReport(body, fourPillarsText, 'report-professional.txt'),
-      generateReport(body, fourPillarsText, 'report-detailed.txt'),
-    ]);
+    const prompt = fs.readFileSync(
+      path.join(process.cwd(), 'src/lib/bazi/prompts', 'report.txt'), 'utf-8'
+    );
+    const filledPrompt = prompt.replace('{fourPillars}', fourPillarsText)
+      .replace('{gender}', body.gender === 'male' ? '男' : '女')
+      .replace('{name}', body.name || '当事人');
 
-    return Response.json({ professional, detailed });
+    const { object } = await generateObject({
+      model: deepseek('deepseek-v4-flash'),
+      prompt: filledPrompt,
+      schema: z.object({
+        professional: z.string(),
+        detailed: z.string(),
+      }),
+      maxOutputTokens: 8000,
+    });
+
+    return Response.json(object);
   } catch (error) {
     const { error: errorMessage, code } = mapErrorToCode(error);
     return Response.json({ error: errorMessage, code }, { status: 500 });
