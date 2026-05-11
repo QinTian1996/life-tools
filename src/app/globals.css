@@ -1,33 +1,7 @@
 @import "tailwindcss";
-
-@font-face {
-  font-family: "LXGW WenKai";
-  src: url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular/result.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "LXGW WenKai";
-  src: url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-light/result.woff2") format("woff2");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "LXGW WenKai";
-  src: url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold/result.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Sarasa Mono SC";
-  src: url("https://cdn.jsdelivr.net/npm/sarasa-gothic-sc@1.0.0/Sarasa-MonoSC-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+@import "lxgw-wenkai-webfont/lxgwwenkai-regular.css";
+@import "lxgw-wenkai-webfont/lxgwwenkai-light.css";
+@import "lxgw-wenkai-webfont/lxgwwenkai-bold.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
