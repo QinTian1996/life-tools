@@ -50,8 +50,8 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
       ref={containerRef}
       onScroll={() => {
         const d = distFromBottom();
-        if (d > 200) pinned.current = false;
-        else if (d <= 100) pinned.current = true;
+        if (d > 50) pinned.current = false;
+        else if (d === 0) pinned.current = true;
       }}
       className="flex-1 overflow-y-auto px-4 py-4"
     >
