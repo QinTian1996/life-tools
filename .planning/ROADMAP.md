@@ -89,7 +89,12 @@ Plans:
 6. LLM-generated HTML is sanitized with DOMPurify before rendering (BZ-16)
 7. User can abort in-flight API request (BZ-17)
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 09-loading-report/09-01-PLAN.md — API routes + prompt templates (Wave 1)
+- [ ] 09-loading-report/09-02-PLAN.md — Loading + Report UI components (Wave 2)
+- [ ] 09-loading-report/09-03-PLAN.md — Page integration + state machine (Wave 3)
 
 **UI hint:** yes
 
@@ -119,7 +124,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 7. Foundation | 1/1 | Planned | - |
 | 8. Input Form | 0/1 | Not started | - |
-| 9. Loading + Report | 0/1 | Not started | - |
+| 9. Loading + Report | 3/3 | Planned | - |
 | 10. Download + Polish | 0/1 | Not started | - |
 
 ## Coverage
