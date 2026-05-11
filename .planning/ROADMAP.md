@@ -112,7 +112,10 @@ Plans:
 2. Downloaded HTML uses CDN fonts and requires no external dependencies (BZ-14)
 3. Downloaded HTML follows project design language (warm minimalist aesthetic) (BZ-15)
 
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 10-download-polish/10-01-PLAN.md — Download button + CSS polish
 
 **UI hint:** yes
 
@@ -125,7 +128,7 @@ Plans:
 | 7. Foundation | 1/1 | Planned | - |
 | 8. Input Form | 0/1 | Not started | - |
 | 9. Loading + Report | 3/3 | Planned | - |
-| 10. Download + Polish | 0/1 | Not started | - |
+| 10. Download + Polish | 1/1 | Planned | - |
 
 ## Coverage
 
