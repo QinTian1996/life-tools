@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       .replace('{name}', body.name || '当事人');
 
     const { object } = await generateObject({
-      model: deepseek('deepseek-v4-flash'),
+      model: deepseek('deepseek-v4-pro'),
       prompt,
       schema: z.object({ roasts: z.array(z.string()) }),
       maxOutputTokens: 1000,

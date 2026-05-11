@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       .replace('{name}', body.name || '当事人');
 
     const { object } = await generateObject({
-      model: deepseek('deepseek-v4-flash'),
+      model: deepseek('deepseek-v4-pro'),
       prompt: filledPrompt,
       schema: z.object({
         professional: z.string(),
