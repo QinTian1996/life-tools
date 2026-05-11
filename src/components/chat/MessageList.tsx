@@ -62,7 +62,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
         }
         const d = distFromBottom();
         if (d > 50) pinned.current = false;
-        else if (d === 0) pinned.current = true;
+        else if (d <= 1) pinned.current = true;
       }}
       className="flex-1 overflow-y-auto px-4 py-4"
     >
