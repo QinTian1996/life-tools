@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import type { BirthInput, CalendarMode, Gender, TimeMode } from "@/lib/bazi/types";
 
 const SHICHEN_OPTIONS = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
@@ -90,14 +89,14 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[80px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{yearLabel}</label>
-          <Input
+          <input
             type="number"
             value={year}
             onChange={(e) => setYear(e.target.value)}
             min={1900}
             max={2100}
             placeholder="2000"
-            className="w-full"
+            className="flex h-10 w-full rounded-[var(--radius-md)] border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]"
           />
         </div>
 
@@ -105,14 +104,14 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
         <div className="flex-1 min-w-[50px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{monthLabel}</label>
           <div className="flex gap-1">
-            <Input
+            <input
               type="number"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
               min={1}
               max={12}
               placeholder="1"
-              className="w-full"
+              className="flex h-10 w-full rounded-[var(--radius-md)] border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-base text-[var(--foreground)]"
             />
             {calendarMode === "lunar" && (
               <label className="flex items-center gap-1 whitespace-nowrap text-xs">
@@ -130,14 +129,14 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
 
         <div className="flex-1 min-w-[50px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{dayLabel}</label>
-          <Input
+          <input
             type="number"
             value={day}
             onChange={(e) => setDay(e.target.value)}
             min={1}
             max={31}
             placeholder="1"
-            className="w-full"
+            className="flex h-10 w-full rounded-[var(--radius-md)] border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-base text-[var(--foreground)]"
           />
         </div>
 
@@ -185,12 +184,16 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
 
         <div className="flex-[2] min-w-[150px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">姓名</label>
-          <Input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="留空将自动生成" className="w-full" />
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="留空将自动生成"
+            className="flex h-10 w-full rounded-[var(--radius-md)] border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]" />
         </div>
 
-        <Button type="submit" variant="primary" disabled={!isValid} title={reason}>
-          排盘
-        </Button>
+        <div>
+          <Button type="submit" variant="primary" disabled={!isValid}>
+            排盘
+          </Button>
+          {reason && <p className="text-xs text-[var(--muted-foreground)] mt-1">{reason}</p>}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-4 items-center border-t border-[var(--border)] pt-3">

@@ -64,7 +64,10 @@ Plans:
 3. Form has proper validation state management — submit is disabled until required fields valid
 4. Form submitted data flows correctly to API layer
 
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 08-input-form/08-01-PLAN.md — Extract BaziForm component + lunar toggle + validation + two-row layout
 
 **UI hint:** yes
 

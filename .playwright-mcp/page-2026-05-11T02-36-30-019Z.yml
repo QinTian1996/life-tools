@@ -1,0 +1,11 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "喵十七" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: 喵十七
+      - generic [ref=e8]: 聊天
+  - main [ref=e10]:
+    - generic [ref=e14]:
+      - textbox "输入消息..." [ref=e15]
+      - button "发送" [disabled]

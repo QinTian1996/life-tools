@@ -1,0 +1,10 @@
+[     575ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[     726ms] [LOG] [HMR] connected @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[   48707ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[   48747ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[  282126ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[  282176ms] [LOG] [Fast Refresh] done in 38ms @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[  307914ms] [ERROR] WebSocket connection to 'ws://localhost:3456/_next/webpack-hmr?id=4chuIlhhAuWbwCfCX8sJt' failed:  @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13322
+[  308919ms] [LOG] [HMR] connected @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
+[  334435ms] [ERROR] WebSocket connection to 'ws://localhost:3456/_next/webpack-hmr?id=4chuIlhhAuWbwCfCX8sJt' failed:  @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13322
+[  335439ms] [LOG] [HMR] connected @ http://localhost:3456/_next/static/chunks/node_modules_next_dist_115brz8._.js:2477
