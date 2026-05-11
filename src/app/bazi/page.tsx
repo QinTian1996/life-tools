@@ -6,6 +6,7 @@ import { BaziForm } from "@/components/bazi/BaziForm";
 import { BaziLoading } from "@/components/bazi/BaziLoading";
 import { BaziReport } from "@/components/bazi/BaziReport";
 import { computeBazi } from "@/lib/bazi/calculator";
+import { getPreRoasts } from "@/lib/bazi/pre-roasts";
 import type { BirthInput, BaziResult } from "@/lib/bazi/types";
 
 type PageState = 'form' | 'loading-roasts' | 'loading-report' | 'done' | 'error';
@@ -51,6 +52,7 @@ export default function BaziPage() {
 
     const bazi = computeBazi(input);
     setCurrentBazi(bazi);
+    setRoasts(getPreRoasts(bazi.dayPillar.stem));
 
     try {
       const roastsResponse = await fetch('/api/bazi/roasts', {

@@ -20,17 +20,13 @@ export function RoastCarousel({ roasts }: RoastCarouselProps) {
         setCurrentIndex((prev) => (prev + 1) % roasts.length);
         setIsVisible(true);
       }, 500);
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [roasts.length]);
 
   if (roasts.length === 0) {
-    return (
-      <div className="text-center py-8 text-[var(--muted-foreground)]">
-        正在生成吐槽...
-      </div>
-    );
+    return null;
   }
 
   return (

@@ -29,7 +29,7 @@ function formatInputSummary(input: BirthInput): string {
 
 export function BaziLoading({ input, baziResult, roasts, phase }: BaziLoadingProps) {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6">
       <div className="text-center">
         <div className="inline-block px-4 py-2 bg-[var(--card)] rounded-full border border-[var(--border)]">
           <span className="text-[var(--muted-foreground)]">正在分析：</span>
@@ -50,11 +50,7 @@ export function BaziLoading({ input, baziResult, roasts, phase }: BaziLoadingPro
       </div>
 
       <div className="text-center text-sm text-[var(--muted-foreground)]">
-        {phase === 'roasts' ? (
-          <span>正在生成吐槽...</span>
-        ) : (
-          <span>正在生成命理报告（预计30-60秒）...</span>
-        )}
+        {phase === 'report' ? '正在生成命理报告（预计30-60秒）...' : null}
       </div>
 
       <RoastCarousel roasts={roasts} />
