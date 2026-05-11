@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import type { UIMessage } from 'ai';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import type { UIMessage, TextUIPart } from 'ai';
 import MessageBubble from './MessageBubble';
 
 interface MessageListProps {
@@ -9,26 +9,53 @@ interface MessageListProps {
   isLoading: boolean;
 }
 
+function lastMessageText(messages: UIMessage[]): string {
+  if (messages.length === 0) return '';
+  const last = messages[messages.length - 1];
+  return last.parts
+    .filter((p): p is TextUIPart => p.type === 'text')
+    .map((p) => p.text)
+    .join('');
+}
+
 export default function MessageList({ messages, isLoading }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const userScrolledUp = useRef(false);
+
+  const text = lastMessageText(messages);
+
+  const scrollToBottom = (smooth: boolean) => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+  };
+
+  const handleScroll = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const { scrollHeight, scrollTop, clientHeight } = el;
+    userScrolledUp.current = scrollHeight - scrollTop - clientHeight > 100;
+  };
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const { scrollHeight, scrollTop, clientHeight } = container;
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-
-    if (distanceFromBottom <= 100) {
-      container.scrollTo({
-        top: scrollHeight,
-        behavior: isLoading ? 'auto' as const : 'smooth',
-      });
+    if (!isLoading && messages.length > 0) {
+      userScrolledUp.current = false;
+      scrollToBottom(true);
     }
-  }, [messages, isLoading]);
+  }, [messages.length]);
+
+  useLayoutEffect(() => {
+    if (isLoading && !userScrolledUp.current) {
+      scrollToBottom(false);
+    }
+  }, [text, isLoading]);
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto px-4 py-4">
+    <div
+      ref={containerRef}
+      onScroll={handleScroll}
+      className="flex-1 overflow-y-auto px-4 py-4"
+    >
       <div className="flex flex-col gap-3">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
