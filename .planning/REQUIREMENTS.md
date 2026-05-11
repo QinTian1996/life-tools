@@ -34,8 +34,8 @@
 
 ### Download (下载)
 
-- [ ] **BZ-14**: 提供 HTML 报告下载（CDN 字体，无需内嵌）
-- [ ] **BZ-15**: 下载报告遵循项目设计语言
+- [x] **BZ-14**: 提供 HTML 报告下载（CDN 字体，无需内嵌）
+- [x] **BZ-15**: 下载报告遵循项目设计语言
 
 ### Safety & Quality (安全与质量)
 
@@ -68,8 +68,8 @@
 | BZ-11 | Phase 9 | Pending |
 | BZ-12 | Phase 9 | Pending |
 | BZ-13 | Phase 9 | Pending |
-| BZ-14 | Phase 10 | Pending |
-| BZ-15 | Phase 10 | Pending |
+| BZ-14 | Phase 10 | Complete |
+| BZ-15 | Phase 10 | Complete |
 | BZ-16 | Phase 9 | Pending |
 | BZ-17 | Phase 9 | Pending |
 | BZ-18 | Phase 7 | Pending |

@@ -21,7 +21,7 @@
 - [ ] **Phase 7: Foundation** — Calendar utilities + Bazi calculator (pure functions, no UI)
 - [ ] **Phase 8: Input Form** — BaziPage + BaziForm component with validation
 - [ ] **Phase 9: Loading + Report** — BaziLoading + BaziReport + API integration
-- [ ] **Phase 10: Download + Polish** — HTML download + sanitization + abort
+- [x] **Phase 10: Download + Polish** — HTML download + sanitization + abort ✅
 
 ## Phase Details
 
@@ -127,8 +127,8 @@ Plans:
 |-------|----------------|--------|-----------|
 | 7. Foundation | 1/1 | Planned | - |
 | 8. Input Form | 0/1 | Not started | - |
-| 9. Loading + Report | 3/3 | Planned | - |
-| 10. Download + Polish | 1/1 | Planned | - |
+| 9. Loading + Report | 3/3 | Complete | ✅ |
+| 10. Download + Polish | 1/1 | Complete | ✅ |
 
 ## Coverage
 
