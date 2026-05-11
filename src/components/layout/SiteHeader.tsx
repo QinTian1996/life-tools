@@ -13,7 +13,6 @@ export default function SiteHeader({ title }: SiteHeaderProps) {
 
   const logoContent = (
     <>
-      <img src="/logo.svg" alt="喵十七" className="h-8 w-auto" />
       <span className="text-lg font-semibold">喵十七</span>
     </>
   );

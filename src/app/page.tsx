@@ -32,6 +32,7 @@ export default function Home() {
           ))}
         </aside>
         <div className="flex-1 flex flex-col items-center justify-center">
+          <img src="/logo.svg" alt="喵十七" className="w-24 h-auto mb-4 opacity-90" />
           <h1 className="text-3xl font-[family-name:var(--font-brand)] font-semibold text-[var(--foreground)] mb-4">喵十七的工具箱 🔧</h1>
           <p className="text-[var(--muted-foreground)] text-lg mb-8">给朋友们的小玩意儿们</p>
           <div className="flex gap-4">
