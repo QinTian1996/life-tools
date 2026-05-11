@@ -26,27 +26,30 @@ A place to dump random tools that might be useful someday. Low commitment, high 
 
 **Archived:** 2026-05-09
 
-## Current Milestone: v2.0 UI Design System & Visual Language
+## Completed Milestones
 
-**Goal:** 建立完整的设计范式体系 — 从设计哲学和原则出发，定义色彩、组件、布局规范，产出可复用实现，所有页面遵循新设计系统。
+### v2.0 UI Design System & Visual Language — COMPLETE ✅ (2026-05-10)
 
-**Core themes:** 温暖 + 简洁（warm + minimal）
+**Goal:** 建立完整的设计范式体系。4 layers: philosophy → tokens → components → migration.
 
-**Target features:**
-- 定义设计范式/理念/视觉原则
-- 暗色模式品牌栏：半透明暖色（不再纯黑）
-- 完整的全局色彩体系（亮 + 暗调色板）
-- 统一组件规范（按钮、卡片、输入框等）
-- 页面布局规范（完善并正式化现有框架）
-- 现有页面按新设计系统改造
+**Delivered:**
+- 8 design principles (温暖极简主义) + 5 anti-patterns
+- Full OKLCH color system: 11 semantic token pairs, amber/warm-stone scales
+- 7-level typography (LXGW WenKai + Sarasa Mono)
+- 4 UI components (Button 3 variants, Card, Badge, Input) with clsx + forwardRef
+- Brand bar dark mode: rgba(28,25,23,0.85) + backdrop-filter blur(12px)
+- Home page + chat page migrated to design tokens
+- 20/20 requirements satisfied, build passes, 0 hardcoded colors remain
 
-**Four-layer design framework:**
-| 层 | 内容 |
-|----|------|
-| 范式/哲学 | 设计理念、视觉原则 |
-| 规范/语言 | 色彩、间距、排版、组件 tokens |
-| 实现/框架 | CSS 变量、Tailwind 主题、组件库 |
-| 应用/改造 | 页面迁移、新页面模板 |
+**Stats:** 4 phases, 6 plans, 20 requirements, audit passed
+**Archive:** `.planning/milestones/v2.0-ROADMAP.md`
+
+## Current State
+
+No active milestone. Project has:
+- Working Next.js 16 app with unified UI layout (`/`, `/chat`, `/api/chat`)
+- Full design system (tokens in globals.css, components in src/components/ui/)
+- 4 UI components (Button, Card, Badge, Input) with asChild/dark mode support
 
 ## Requirements
 
