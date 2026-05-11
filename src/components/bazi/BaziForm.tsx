@@ -67,6 +67,17 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
   }
 
   const isValid = isFormValid();
+
+  function disabledReason(): string {
+    const y = Number(year), m = Number(month), d = Number(day);
+    if (!year || isNaN(y) || y < 1900 || y > 2100) return "年份需在 1900–2100";
+    if (!month || isNaN(m) || m < 1 || m > 12) return "月份需在 1–12";
+    if (!day || isNaN(d) || d < 1 || d > 31) return "日期需在 1–31";
+    if (!gender) return "请选择性别";
+    return "";
+  }
+
+  const reason = disabledReason();
   const yearLabel = calendarMode === "solar" ? "年份" : "年份(农历)";
   const monthLabel = calendarMode === "solar" ? "月份" : "月份(农历)";
   const dayLabel = calendarMode === "solar" ? "日期" : "日期(农历)";
@@ -77,7 +88,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
       className="space-y-4 bg-[var(--card)] rounded-lg p-6 border border-[var(--border)]"
     >
       <div className="flex flex-wrap gap-3 items-end">
-        <div className="flex-1 min-w-[60px]">
+        <div className="flex-1 min-w-[80px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{yearLabel}</label>
           <Input
             type="number"
@@ -177,7 +188,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
           <Input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="留空将自动生成" className="w-full" />
         </div>
 
-        <Button type="submit" variant="primary" disabled={!isValid}>
+        <Button type="submit" variant="primary" disabled={!isValid} title={reason}>
           排盘
         </Button>
       </div>
