@@ -15,9 +15,9 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [timeMode, setTimeMode] = useState<TimeMode>("precise");
   const [gender, setGender] = useState<Gender>("male");
-  const [year, setYear] = useState("");
-  const [month, setMonth] = useState("");
-  const [day, setDay] = useState("");
+  const [year, setYear] = useState("2000");
+  const [month, setMonth] = useState("1");
+  const [day, setDay] = useState("1");
   const [hour, setHour] = useState("12");
   const [minute, setMinute] = useState("0");
   const [shichen, setShichen] = useState("子");
@@ -67,16 +67,17 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
 
   const isValid = isFormValid();
 
-  function disabledReason(): string {
+  function disabledReasons(): string[] {
+    const reasons: string[] = [];
     const y = Number(year), m = Number(month), d = Number(day);
-    if (!year || isNaN(y) || y < 1900 || y > 2100) return "年份需在 1900–2100";
-    if (!month || isNaN(m) || m < 1 || m > 12) return "月份需在 1–12";
-    if (!day || isNaN(d) || d < 1 || d > 31) return "日期需在 1–31";
-    if (!gender) return "请选择性别";
-    return "";
+    if (!year || isNaN(y) || y < 1900 || y > 2100) reasons.push("年份需在 1900–2100");
+    if (!month || isNaN(m) || m < 1 || m > 12) reasons.push("月份需在 1–12");
+    if (!day || isNaN(d) || d < 1 || d > 31) reasons.push("日期需在 1–31");
+    if (!gender) reasons.push("请选择性别");
+    return reasons;
   }
 
-  const reason = disabledReason();
+  const failingReasons = disabledReasons();
   const yearLabel = calendarMode === "solar" ? "年份" : "年份(农历)";
   const monthLabel = calendarMode === "solar" ? "月份" : "月份(农历)";
   const dayLabel = calendarMode === "solar" ? "日期" : "日期(农历)";
@@ -188,11 +189,18 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
             className="flex h-10 w-full rounded-[var(--radius-md)] border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-base text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]" />
         </div>
 
-        <div>
+        <div className="relative group">
           <Button type="submit" variant="primary" disabled={!isValid}>
             排盘
           </Button>
-          {reason && <p className="text-xs text-[var(--muted-foreground)] mt-1">{reason}</p>}
+          {failingReasons.length > 0 && (
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
+              <div className="bg-[var(--foreground)] text-[var(--background)] text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
+                {failingReasons.map((r, i) => <div key={i}>{r}</div>)}
+              </div>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[var(--foreground)]" />
+            </div>
+          )}
         </div>
       </div>
 
