@@ -44,7 +44,7 @@ async function generateReport(promptFile: string, fourPillarsText: string, input
     .replace('{name}', input.name || '当事人');
 
   const { object } = await generateObject({
-    model: deepseek('deepseek-v4-flash'),
+    model: deepseek('deepseek-v4-pro'),
     prompt: filledPrompt,
     schema: contentSchema,
     maxOutputTokens: 8000,
