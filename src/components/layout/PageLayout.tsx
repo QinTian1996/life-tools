@@ -7,9 +7,9 @@ interface PageLayoutProps {
 
 export default function PageLayout({ title, children }: PageLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)]">
+    <div className="h-screen flex flex-col bg-[var(--background)]">
       <SiteHeader title={title} />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 min-h-0 flex flex-col">
         {children}
       </main>
     </div>

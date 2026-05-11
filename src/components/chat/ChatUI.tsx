@@ -32,7 +32,7 @@ export default function ChatUI() {
   const displayError = error ?? localError;
 
   return (
-    <div className="flex flex-col h-full pb-20">
+    <div className="flex flex-col flex-1 min-h-0 pb-20">
       <MessageList messages={messages satisfies UIMessage[]} isLoading={isLoading} />
 
       <ChatInput
