@@ -56,7 +56,7 @@ async function generateReport(input: BirthInput, fourPillarsText: string, prompt
   const { text } = await generateText({
     model: deepseek('deepseek-v4-flash'),
     prompt: filledPrompt,
-    maxOutputTokens: 4000,
+    maxOutputTokens: 8000,
   });
 
   return text.trim();
