@@ -55,50 +55,42 @@ export default function BaziPage() {
     setRoasts(getPreRoasts(bazi.dayPillar.stem));
 
     try {
-      const roastsResponse = await fetch('/api/bazi/roasts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
-        signal: abortControllerRef.current.signal,
-      });
-
-      if (!roastsResponse.ok) {
-        const error = await roastsResponse.json();
-        throw new Error(error.error || '获取吐槽失败');
+      const safeFetch = async (url: string, body: BirthInput): Promise<{ ok: boolean; json: Record<string, unknown> | null }> => {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: abortControllerRef.current!.signal,
+        });
+        const text = await res.text();
+        try { return { ok: res.ok, json: JSON.parse(text) }; }
+        catch { return { ok: false, json: { error: text.slice(0, 200) } }; }
+      } catch {
+        return { ok: false, json: { error: '网络请求失败' } };
       }
+    };
 
-      const roastsData = await roastsResponse.json();
-      setRoasts(roastsData.roasts || []);
+    const roastsRes = await safeFetch('/api/bazi/roasts', input);
+    if (!roastsRes.ok) throw new Error(String(roastsRes.json?.error || '获取吐槽失败'));
+    setRoasts((roastsRes.json as Record<string, string[]>).roasts || []);
 
-      setState('loading-report');
+    setState('loading-report');
 
-      const reportResponse = await fetch('/api/bazi/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
-        signal: abortControllerRef.current.signal,
-      });
+    const reportRes = await safeFetch('/api/bazi/report', input);
+    if (!reportRes.ok) throw new Error(String(reportRes.json?.error || '生成报告失败'));
 
-      if (!reportResponse.ok) {
-        const error = await reportResponse.json();
-        throw new Error(error.error || '生成报告失败');
-      }
-
-      const reportData = await reportResponse.json();
-      setReport({
-        professional: reportData.professional || '',
-        detailed: reportData.detailed || '',
-      });
-
-      setState('done');
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        return;
-      }
-      setErrorMessage(err instanceof Error ? err.message : '发生错误');
-      setState('error');
-    }
-  }, []);
+    setReport({
+      professional: String(reportRes.json?.professional || ''),
+      detailed: String(reportRes.json?.detailed || ''),
+    });
+    setState('done');
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') return;
+    setErrorMessage(err instanceof Error ? err.message : '发生错误');
+    setState('error');
+  }
+}, []);
 
   const handleReset = useCallback(() => {
     if (abortControllerRef.current) {
