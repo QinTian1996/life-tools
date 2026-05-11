@@ -42,9 +42,6 @@ export function buildDownloadTemplate(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-light.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css">
   <style>
     body { background: oklch(0.98 0.01 50); color: oklch(0.18 0.01 50); }
     /* CSS variables for light mode */
@@ -53,7 +50,7 @@ export function buildDownloadTemplate(
       --foreground: oklch(0.18 0.01 50);
       --card: oklch(0.98 0.01 50);
       --border: oklch(0.92 0.02 50);
-      --font-brand: "LXGW WenKai", system-ui, sans-serif;
+      --font-brand: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
     }
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
