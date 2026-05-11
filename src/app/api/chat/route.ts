@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     const windowedMessages = messages.slice(-MAX_MESSAGES) as ModelMessage[];
 
     const result = streamText({
-      model: deepseek('deepseek-v4-pro'),
+      model: deepseek('deepseek-v4-flash'),
       messages: windowedMessages,
       maxOutputTokens: MAX_TOKENS,
       ...(temperature !== undefined && { temperature }),
