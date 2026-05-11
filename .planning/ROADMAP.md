@@ -42,7 +42,12 @@
 7. System computes 大运 and 十神 from birth data (BZ-08)
 8. User visiting `/bazi` sees a page with PageLayout wrapper and basic page skeleton (BZ-18)
 
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 07-foundation/07-01-PLAN.md — Install lunisolar + create lib files + scaffold /bazi page
+
+---
 
 ---
 
@@ -109,7 +114,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Foundation | 0/1 | Not started | - |
+| 7. Foundation | 1/1 | Planned | - |
 | 8. Input Form | 0/1 | Not started | - |
 | 9. Loading + Report | 0/1 | Not started | - |
 | 10. Download + Polish | 0/1 | Not started | - |
