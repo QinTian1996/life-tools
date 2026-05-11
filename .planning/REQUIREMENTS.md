@@ -1,93 +1,81 @@
 # Requirements: 喵十七的工具箱
 
-**Defined:** 2026-05-09
-**Core Value:** 为"喵十七的工具箱"建立温暖简洁的设计范式体系，所有页面遵循统一视觉语言
-**Milestone:** v2.0 UI Design System & Visual Language
+**Defined:** 2026-05-11
+**Core Value:** A place to dump random tools that might be useful someday.
+**Milestone:** v3.0 八字命理工具
 
-## v2.0 Requirements
+## v3.0 Requirements
 
-### Layer 1: Design Philosophy & Principles (范式/哲学)
+### Calendar & Input (日历与输入)
 
-- [ ] **DSGN-01**: 定义"温暖极简主义"设计理念文档，明确核心原则（温暖、简洁、克制、工具感）
-- [ ] **DSGN-02**: 定义设计原则的具体含义和判断标准（何时加装饰、何时去除、如何保持温暖感而非冷感）
-- [ ] **DSGN-03**: 定义反模式清单：明确禁止的设计做法（如纯黑背景、多重阴影、装饰性渐变等）
+- [ ] **BZ-01**: 年份、日期分开输入
+- [ ] **BZ-02**: 日期支持公历和农历切换
+- [ ] **BZ-03**: 时间可精确到半小时、或选时辰（子丑寅卯...）、或"不知道"
+- [ ] **BZ-04**: 性别必选（男女）
+- [ ] **BZ-05**: 姓名选填，留空时 LLM 生成"〈形容词〉的〈动物〉"格式名
+- [ ] **BZ-06**: 首页"算八字"按钮链接到 `/bazi`
 
-### Layer 2: Design Tokens & Specifications (规范/语言)
+### Bazi Computation (八字排盘)
 
-- [ ] **TOKN-01**: 定义完整暖色调色彩调色板 — 亮色模式包含主色（amber）、辅色（warm-stone）、语义色（success/destructive/warning），每色5-10个色阶
-- [ ] **TOKN-02**: 定义暗色模式色彩调色板 — 暖色暗底（非纯黑），amber 色阶向亮偏移，表面层级通过色值区分
-- [ ] **TOKN-03**: 定义品牌栏暗色模式配色 — 半透明暖色背景 + backdrop-filter 模糊效果
-- [ ] **TOKN-04**: 定义排版体系 — 字体族、字号层级（7-9级）、字重（400/510/590）、行高
-- [ ] **TOKN-05**: 定义间距体系 — 基于 8px 节奏的间距 tokens（4/8/12/16/24/32/48）
-- [ ] **TOKN-06**: 定义圆角和阴影 tokens — 暖色系阴影（非纯灰），圆角 6-16px 范围
+- [ ] **BZ-07**: 系统根据输入计算四柱八字（年柱/月柱/日柱/时柱）
+- [ ] **BZ-08**: 系统计算大运、十神等基础信息
 
-### Layer 3: CSS Implementation & Component Library (实现/框架)
+### Loading Experience (等待体验)
 
-- [ ] **IMPL-01**: 重写 `src/app/globals.css` — 使用 Tailwind CSS 4 `@theme` + `@variant dark { }` 实现完整设计 token 体系
-- [ ] **IMPL-02**: 实现暗色模式语义 token — `@variant dark { }` 块中定义所有暗色模式色彩覆写
-- [ ] **IMPL-03**: 实现品牌栏暗色模式修复 — 替换当前 `#0a0a0a` 为暖色半透明 + backdrop-filter
-- [ ] **IMPL-04**: 建立 Button 组件和样式 — primary/secondary/ghost 变体，统一圆角/间距/hover 态
-- [ ] **IMPL-05**: 建立 Card 组件和样式 — 统一卡片容器，含 padding/圆角/边框/阴影
-- [ ] **IMPL-06**: 建立 Badge 组件和样式 — 状态标签（success/warning/default）
-- [ ] **IMPL-07**: 建立 Input 组件和样式 — 输入框统一外观，含 focus/focus-visible 环状高亮
+- [ ] **BZ-09**: 提交后显示输入信息回显 + 已计算的八字四柱
+- [ ] **BZ-10**: 等待期间吐槽轮播（LLM 生成多条，渐入渐出 5s/条）
 
-### Layer 4: Page Migration (应用/改造)
+### Report Rendering (报告展示)
 
-- [ ] **MIGR-01**: 改造首页 (`src/app/page.tsx`) — 首页内容遵循新设计 token，使用新组件（Button、Card）
-- [x] **MIGR-02**: 改造聊天页 (`src/components/chat/`) — 聊天组件遵循新设计 token，输入框/按钮使用新组件
-- [ ] **MIGR-03**: 验证亮色模式 — 首页和聊天页在亮色模式下视觉一致，token 正确应用
-- [ ] **MIGR-04**: 验证暗色模式 — 品牌栏为暖色而非纯黑，所有页面在暗色下可读，token 正确切换
+- [ ] **BZ-11**: LLM 生成命理报告并在页面渲染（可滚动），支持专业版/详解版切换
+- [ ] **BZ-12**: 生成完成后底部保留输入栏
+- [ ] **BZ-13**: 重新提交时清空旧报告
 
-## v1.0 Requirements (Validated)
+### Download (下载)
 
-Requirements from v1.0 that have shipped and remain valid:
+- [ ] **BZ-14**: 提供 HTML 报告下载（CDN 字体，无需内嵌）
+- [ ] **BZ-15**: 下载报告遵循项目设计语言
 
-- ✓ **CHAT-01**: 首页增加「聊天」按钮 — v1.0
-- ✓ **CHAT-02**: `/chat` 路由显示简易聊天界面 — v1.0
-- ✓ **CHAT-03**: 调用 DeepSeek API 进行对话 — v1.0
-- ✓ **CHAT-04**: 支持发送消息并显示 AI 回复 — v1.0
-- ✓ **UI-01**: 统一品牌导航栏（SiteHeader + LOGO + 暗色模式） — post-v1.0
-- ✓ **UI-02**: 统一页面布局框架（PageLayout） — post-v1.0
-- ✓ **UI-03**: 首页和聊天页迁移到统一布局 — post-v1.0
+### Safety & Quality (安全与质量)
+
+- [ ] **BZ-16**: LLM 生成的 HTML 内容经 DOMPurify 消毒
+- [ ] **BZ-17**: API 请求支持 AbortController 中止
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Figma/Sketch 设计稿 | 个人项目，CSS 直接作为设计源 |
-| 动画/过渡系统 | 保持简洁，仅 CSS transition |
-| 响应式移动端设计 | 桌面优先，移动端不在范围内 |
-| Storybook/文档平台 | 项目规模不需要文档站点 |
+| PDF 报告下载 | HTML 下载已满足需求，PDF 需额外 puppeteer 依赖 |
+| 合婚（两个八字对比） | 独立功能，放入未来 milestone |
+| 手机端适配 | 桌面优先，保持与项目一致 |
+| 用户登录/历史记录 | 项目无认证系统 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DSGN-01 | — | Pending |
-| DSGN-02 | — | Pending |
-| DSGN-03 | — | Pending |
-| TOKN-01 | — | Pending |
-| TOKN-02 | — | Pending |
-| TOKN-03 | — | Pending |
-| TOKN-04 | — | Pending |
-| TOKN-05 | — | Pending |
-| TOKN-06 | — | Pending |
-| IMPL-01 | — | Pending |
-| IMPL-02 | — | Pending |
-| IMPL-03 | — | Pending |
-| IMPL-04 | — | Pending |
-| IMPL-05 | — | Pending |
-| IMPL-06 | — | Pending |
-| IMPL-07 | — | Pending |
-| MIGR-01 | — | Pending |
-| MIGR-02 | 06-02 | Complete |
-| MIGR-03 | — | Pending |
-| MIGR-04 | — | Pending |
+| BZ-01 | — | Pending |
+| BZ-02 | — | Pending |
+| BZ-03 | — | Pending |
+| BZ-04 | — | Pending |
+| BZ-05 | — | Pending |
+| BZ-06 | — | Pending |
+| BZ-07 | — | Pending |
+| BZ-08 | — | Pending |
+| BZ-09 | — | Pending |
+| BZ-10 | — | Pending |
+| BZ-11 | — | Pending |
+| BZ-12 | — | Pending |
+| BZ-13 | — | Pending |
+| BZ-14 | — | Pending |
+| BZ-15 | — | Pending |
+| BZ-16 | — | Pending |
+| BZ-17 | — | Pending |
 
 **Coverage:**
-- v2.0 requirements: 20 total
+- v3.0 requirements: 18 total
 - Mapped to phases: 0 (pending roadmap)
 
 ---
-*Requirements defined: 2026-05-09*
-*Last updated: 2026-05-09 after initial definition*
+*Requirements defined: 2026-05-11*
+*Last updated: 2026-05-11 after initial definition*
