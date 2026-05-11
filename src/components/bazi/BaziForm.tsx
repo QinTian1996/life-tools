@@ -223,7 +223,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
             aria-checked={calendarMode === "lunar"}
             onClick={() => setCalendarMode(calendarMode === "solar" ? "lunar" : "solar")}
             className={`relative inline-block w-11 h-6 rounded-full transition-colors duration-200 ${
-              calendarMode === "lunar" ? "bg-[var(--primary)]" : "bg-[var(--color-warm-stone-300)]"
+              calendarMode === "lunar" ? "bg-[var(--primary)]" : "bg-[var(--color-warm-stone-400)]"
             }`}
           >
             <span
@@ -244,7 +244,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 timeMode === mode
                   ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-warm-stone-100)]"
+                  : "bg-[var(--color-warm-stone-200)] text-[var(--color-warm-stone-700)] hover:bg-[var(--color-warm-stone-300)]"
               }`}
             >
               {mode === "precise" ? "时间" : "时辰"}
