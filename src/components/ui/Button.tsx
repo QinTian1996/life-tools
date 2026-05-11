@@ -24,7 +24,7 @@ export function Button({
 }: ButtonProps) {
   const baseClasses = cn(
     "inline-flex items-center justify-center rounded-[var(--radius-lg)] font-brand font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
-    variant === "primary" && "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--color-amber-600)] active:scale-[0.98]",
+    variant === "primary" && "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--color-amber-700)] active:scale-[0.98]",
     variant === "secondary" && "bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:bg-[var(--color-warm-stone-200)] active:scale-[0.98]",
     variant === "ghost" && "text-[var(--foreground)] hover:bg-[var(--secondary)] active:scale-[0.98]",
     size === "default" && "h-10 px-4 py-2 text-base",
