@@ -51,6 +51,20 @@ No active milestone. Project has:
 - Full design system (tokens in globals.css, components in src/components/ui/)
 - 4 UI components (Button, Card, Badge, Input) with asChild/dark mode support
 
+## Current Milestone: v3.0 八字命理工具
+
+**Goal:** 实现八字排盘+AI 命理分析工具，复用现有 chat 模块的 LLM 接入（DeepSeek API）。
+
+**Target features:**
+- 输入表单：公历/农历切换、日期时间时辰、性别（必填）、姓名（选填/LLM 生成）
+- 等待动画：输入回显 + 八字四柱 + 吐槽轮播（多条，渐入渐出 5s/条）
+- 报告渲染在主区域（可滚动），底部保留输入栏，重新提交清旧报告
+- HTML 报告下载
+- 遵循温暖极简设计语言 + 轻松字体
+
+**Reference:** `bazi-minimal/` 工作流（陆致极框架 + 韦千里八步法）
+**Route:** `/bazi`
+
 ## Requirements
 
 ### Validated
