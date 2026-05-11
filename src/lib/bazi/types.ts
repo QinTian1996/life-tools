@@ -18,6 +18,7 @@ export interface BirthInput {
   timeMode: TimeMode;
   shichen?: string;     // 时辰 name e.g. '子', '丑', used when timeMode='shichen'
   gender: Gender;
+  name?: string;
 }
 
 // 天干地支 pillar representation
