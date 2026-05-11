@@ -22,7 +22,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
     if (distanceFromBottom <= 100) {
       container.scrollTo({
         top: scrollHeight,
-        behavior: 'smooth',
+        behavior: isLoading ? 'auto' as const : 'smooth',
       });
     }
   }, [messages, isLoading]);
