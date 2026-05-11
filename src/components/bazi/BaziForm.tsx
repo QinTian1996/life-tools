@@ -25,13 +25,14 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
   const [name, setName] = useState("");
 
   function isFormValid(): boolean {
-    const yearNum = parseInt(year);
-    const monthNum = parseInt(month);
-    const dayNum = parseInt(day);
+    const yearNum = Number(year);
+    const monthNum = Number(month);
+    const dayNum = Number(day);
 
-    if (isNaN(yearNum) || yearNum < 1900 || yearNum > 2100) return false;
-    if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) return false;
-    if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) return false;
+    if (!year || isNaN(yearNum) || yearNum < 1900 || yearNum > 2100) return false;
+    if (!month || isNaN(monthNum) || monthNum < 1 || monthNum > 12) return false;
+    if (!day || isNaN(dayNum) || dayNum < 1 || dayNum > 31) return false;
+    if (!gender) return false;
 
     return true;
   }
