@@ -20,7 +20,7 @@ export default function ChatUI() {
     transport,
   });
 
-  const isLoading = status === 'streaming';
+  const isLoading = status === 'streaming' || status === 'submitted';
 
   const handleSubmit = () => {
     if (!input.trim()) return;

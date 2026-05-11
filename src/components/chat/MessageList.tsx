@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import type { UIMessage } from 'ai';
+import type { UIMessage, TextUIPart } from 'ai';
 import MessageBubble from './MessageBubble';
 
 interface MessageListProps {
@@ -9,72 +9,49 @@ interface MessageListProps {
   isLoading: boolean;
 }
 
+function allText(messages: UIMessage[]): string {
+  return messages
+    .map((m) =>
+      m.parts
+        .filter((p): p is TextUIPart => p.type === 'text')
+        .map((p) => p.text)
+        .join(''),
+    )
+    .join('');
+}
+
 export default function MessageList({ messages, isLoading }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const userScrolledUp = useRef(false);
-  const prevLoading = useRef(false);
+  const shouldFollow = useRef(true);
 
-  const isAtBottom = () => {
+  const text = allText(messages);
+
+  const atBottom = () => {
     const el = containerRef.current;
     if (!el) return true;
     return el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
   };
 
-  const scrollToBottom = (smooth: boolean) => {
-    if (smooth) {
-      sentinelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    } else {
-      const el = containerRef.current;
-      if (!el) return;
-      el.scrollTop = el.scrollHeight;
-    }
-  };
-
   useEffect(() => {
-    if (isLoading && !prevLoading.current) {
-      userScrolledUp.current = !isAtBottom();
-    }
-    if (prevLoading.current && !isLoading) {
-      userScrolledUp.current = false;
-      scrollToBottom(true);
-    }
-    prevLoading.current = isLoading;
-  }, [isLoading]);
-
-  useEffect(() => {
-    userScrolledUp.current = false;
-    scrollToBottom(true);
-  }, [messages.length]);
-
-  useEffect(() => {
-    if (!isLoading || userScrolledUp.current) return;
+    if (!shouldFollow.current) return;
     const el = containerRef.current;
     if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: 'auto' });
+  }, [text]);
 
-    let raf = 0;
-    const tick = () => {
-      el.scrollTop = el.scrollHeight;
-      raf = 0;
-    };
-
-    const observer = new MutationObserver(() => {
-      if (!raf) raf = requestAnimationFrame(tick) as unknown as number;
-    });
-
-    observer.observe(el, { childList: true, subtree: true, characterData: true });
-
-    return () => {
-      observer.disconnect();
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [isLoading]);
+  useEffect(() => {
+    shouldFollow.current = true;
+    const el = containerRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }
+  }, [messages.length]);
 
   return (
     <div
       ref={containerRef}
       onScroll={() => {
-        userScrolledUp.current = !isAtBottom();
+        shouldFollow.current = atBottom();
       }}
       className="flex-1 overflow-y-auto px-4 py-4"
     >
@@ -82,7 +59,6 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
-        <div ref={sentinelRef} />
 
         {isLoading && (
           <div className="flex justify-start">
