@@ -1,209 +1,343 @@
-# Feature Research
+# Feature Landscape: 八字命理工具
 
-**Domain:** LLM Chat Interface (personal toolbox)
-**Researched:** 2026-05-08
-**Confidence:** HIGH
-
-## Context
-
-Simple chat feature for 喵十七的工具箱 — a personal toolbox of casual tools for friends. This is one tool among several (bazi calculator, food picker). No auth. Single model (DeepSeek). Greenfield — no existing API routes or chat code.
-
-**Stack:** Next.js 16 + React 19 + Tailwind CSS 4 + DeepSeek API (`deepseek-v4-flash`)
-**AI SDK:** Vercel AI SDK (`ai` + `@ai-sdk/deepseek`) provides `useChat` hook + streaming out of the box.
+**Domain:** Bazi (八字) divination web tool
+**Researched:** 2026-05-11
+**Overall confidence:** HIGH
 
 ---
 
-## Feature Landscape
+## Executive Summary
 
-### Table Stakes (Users Expect These)
-
-Features users assume exist. Missing these = product feels broken.
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Message input field | Core interaction — no input = no chat | LOW | Textarea, clear on send. AI SDK `useChat` provides `input` + `handleInputChange` |
-| Send button + Enter key | Both triggers expected | LOW | Form submit with `handleSubmit` from `useChat` |
-| Conversation display | Users need to see what they said and the reply | LOW | Map `messages` array from `useChat` to styled bubbles |
-| User vs Assistant styling | Must visually distinguish who said what | LOW | Alignment (right/left), colors, optional avatar |
-| Loading/streaming state | Users need feedback that something is happening | LOW | AI SDK `status` field: `'ready'` / `'streaming'`. Show typing indicator or spinner |
-| Error handling | API failures happen — users need to know | LOW | AI SDK provides `error` field. Show user-friendly toast/message |
-| Server-side API route | API key must NOT be exposed to client | MEDIUM | `src/app/api/chat/route.ts` — proxy to DeepSeek via `@ai-sdk/deepseek` |
-| Auto-scroll to latest message | Without this, new messages appear off-screen | LOW | `scrollIntoView` ref on new message. ~5 lines of code |
-
-### Nice-to-Have (Enhance UX, Can Defer)
-
-Features that improve the experience but aren't required for first launch.
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Streaming responses | Real-time token display vs staring at blank screen for seconds | LOW* | AI SDK `streamText` handles this natively. *Low with AI SDK, MEDIUM without |
-| Markdown rendering | AI responses include lists, bold, headers, code blocks | LOW | `react-markdown` package. Without it, raw `**bold**` looks broken |
-| Conversation persistence (localStorage) | Messages survive page refresh | LOW | `useEffect` save/load messages array to `localStorage`. ~20 lines |
-| Copy message button | Copy AI response (especially code) in one click | LOW | `navigator.clipboard.writeText()` + icon button |
-| Clear conversation | Start fresh without reloading page | LOW | Reset messages array + localStorage |
-| Empty state / welcome message | Guides new users on what to do | LOW | Static message or suggestion chips when `messages.length === 0` |
-| Code syntax highlighting | Colorized code in AI responses | MEDIUM | `react-syntax-highlighter` or `rehype-pretty-code`. Adds bundle weight (~50KB) |
-| Stop generation button | Cancel a long-running response mid-stream | LOW | AI SDK provides `stop()` function. One button |
-| Responsive design | Works on mobile devices | LOW | Already using Tailwind — ensure flex layout + proper sizing |
-| New conversation button | Reset and start fresh conversation | LOW | Clear messages + localStorage + optionally reset API thread |
-
-### Anti-Features (Commonly Requested, Often Problematic)
-
-Features that seem good but create problems for this project.
-
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| Multi-model switching | "Let users pick between GPT/Claude/DeepSeek" | Adds abstraction layer, UI complexity, multiple API keys — for a single-model personal tool | Hardcode single model. Add switching later IF needed |
-| User authentication | "Protect the API from abuse" | OAuth/sessions/passwords = massive scope increase for a friends-only tool | Share URL privately. Rate-limit at infra level if needed |
-| Message editing | "Let me fix my typos" | Breaks conversation context, adds complex branching state | Just send a new message with correction. LLMs handle this fine |
-| Prompt engineering UI | "Temperature sliders, system prompt fields" | Configuration UI for a casual tool — nobody will use it | Hardcode good defaults in the API route |
-| Conversation export (PDF/Markdown) | "Save interesting chats" | Adds rendering pipeline for marginal value | Browser print / Ctrl+S if truly needed |
-| Chat branching/forking | "Explore different paths from a message" | Exponentially complex state management | Start new conversation instead |
-| Shared conversations | "Send a link to a chat" | Requires database, unique URLs, auth | Screenshot or copy-paste |
-| Usage analytics | "Track API costs" | Adds tracking infra for a personal tool | Check DeepSeek dashboard directly |
-| File/image upload | "Chat with images" | DeepSeek `v4-flash` doesn't support vision. Adds multipart handling | Text-only chat is the right scope |
+A Bazi analysis web tool that transforms birth data (date/time, gender, optional name) into AI-generated fortune reports. The core experience is: user inputs birth details → sees loading animation with their computed 八字 chart and rotating commentary → receives a scrollable dual-version report (专业版 + 详解版) → can download as self-contained HTML. The tool leverages existing DeepSeek API infrastructure from the `/chat` module and follows the warm-minimalist design language established in v2.0.
 
 ---
 
-## Feature Dependencies
+## 1. Calendar UX
+
+### 1.1 Date Input Modes
+
+| Mode | Behavior | Implementation |
+|------|----------|----------------|
+| **公历 (Gregorian)** | Standard date picker, default | `<input type="date">` with locale formatting |
+| **农历 (Lunar)** | Lunar date picker with month/year/day | Requires conversion library (see Lunar Conversion below) |
+
+#### Lunar Conversion Requirements
+
+**Critical technical challenge:** Converting lunar dates to Gregorian for Bazi computation.
+
+- **Best source:** `nongli114.com` — search format `"乙亥(1995)年四月初二"`, description field gives Gregorian directly
+- **Backup:** HK Observatory PDF calendar, web search
+- **API option:** `https://www.iamwawa.cn/nongli/api/?type=lunar&year=1995&month=4&day=2` (may have limited access)
+- **Always verify** with at least two sources when possible
+- **腊月 edge case:** 2001年腊月 = 公历 2002年1月左右, NOT 2001年12月
+
+**Recommendation:** Use a lunar calendar library like `lunar-calendar` or `chinese-calendar` for client-side conversion, with nongli114.com as fallback for edge cases.
+
+### 1.2 Time Input
+
+| Field | Range | Notes |
+|-------|-------|-------|
+| **时辰 (Hour)** | 子时(23-01), 丑时(01-03), ... 亥时(21-23) | 12时辰, 2-hour blocks |
+| **Precision** | Select from dropdown, not free text | Avoids invalid times |
+
+**时辰 Selector UX:**
+- Dropdown with Chinese names: 子时, 丑时, 寅时, 卯时, 辰时, 巳时, 午时, 未时, 申时, 酉时, 戌时, 亥时
+- Each shows time range: 子时 (23:00-00:59)
+- Default: none selected (required field)
+
+### 1.3 Gender Selection
+
+| Gender | Required | UI |
+|--------|----------|-----|
+| 男 (Male) | ✅ Yes | Radio button or segmented control |
+| 女 (Female) | ✅ Yes | Radio button or segmented control |
+
+**Critical:** Gender affects 大运 direction (顺排/逆排) and 六亲 analysis. Cannot be optional.
+
+### 1.4 Name Input
+
+| Behavior | Implementation |
+|----------|----------------|
+| Optional | Empty input shows placeholder |
+| LLM-generated default | If empty, generate as `⟨形容词⟩的⟨动物⟩` e.g., "悠闲的狐狸" |
+| Passed to LLM | So report can address user directly |
+
+### 1.5 Form Validation
+
+| Field | Validation | Error Message |
+|-------|------------|---------------|
+| Date | Valid date, not in future (except today) | "出生日期不能是未来" |
+| 时辰 | Must select one | "请选择出生时辰" |
+| Gender | Must select one | "请选择性别" |
+| Name | Max 20 characters if provided | "姓名最多20字" |
+
+---
+
+## 2. Loading State
+
+### 2.1 What to Show During LLM Generation (30-60s wait)
+
+The loading state must be engaging, not a blank screen. Per the milestone context:
+
+**Three-layer loading display:**
+
+| Layer | Content | Timing |
+|-------|---------|--------|
+| **1. Input echo** | "乙亥年四月初二 巳时 | 男" | Immediate |
+| **2. Computed 八字 chart** | 年柱 月柱 日柱 时柱 with stems/branches | Fades in after 1s |
+| **3. Rotating roasts** | 吐槽轮播，渐入渐出 5s/条 | Starts immediately, cycles |
+
+### 2.2 八字 Chart Display
 
 ```
-[Server API Route]
-    └──required-by──> [Message Input + Send]
-                          └──required-by──> [Conversation Display]
-                                                └──required-by──> [Auto-Scroll]
-                                                └──required-by──> [User/Assistant Styling]
-
-[Streaming Responses] ──requires──> [Server API Route]
-                                └──requires──> [@ai-sdk/deepseek package]
-
-[Markdown Rendering] ──enhances──> [Conversation Display]
-
-[Code Syntax Highlighting] ──requires──> [Markdown Rendering]
-
-[Conversation Persistence] ──requires──> [Conversation Display]
-
-[Stop Generation] ──requires──> [Streaming Responses]
-
-[Copy Message] ──requires──> [Conversation Display]
-
-[New Conversation] ──requires──> [Conversation Persistence]
+年柱: 乙亥 (木水)    月柱: 辛巳 (金火)    日柱: 己未 (土土)    时柱: 乙巳 (木火)
 ```
 
-### Dependency Notes
+**Styling:** Monospace or tabular numbers, clear stem-branch pairing, element color hints (optional).
 
-- **All features require Server API Route:** The DeepSeek API key must stay server-side. Every client feature depends on having the `/api/chat` route working first.
-- **Streaming requires @ai-sdk/deepseek:** Using Vercel AI SDK makes streaming near-zero effort. Without it, you'd manually handle `ReadableStream` + `TextDecoder`.
-- **Markdown enhances Display:** Not technically required, but AI responses look terrible without it (raw `**bold**` syntax).
-- **Code Highlighting requires Markdown:** Must parse markdown before you can highlight code blocks within it.
-- **Stop requires Streaming:** Only meaningful when responses stream in gradually.
+### 2.3 Rotating Commentary (吐槽)
 
----
+**Content:** Humorous or insightful one-liners about the 八字 being computed. Examples:
+- "这八字...说实话，我算过更难的"
+- "让我看看...哦豁，这个有意思"
+- "等等，让我确认一下这个格局"
 
-## MVP Definition
+**Timing:** Each comment: 5s fade-in-out, cycles through 5-10 pre-loaded options.
 
-### Launch With (v1)
+**Animation:** CSS transition with opacity, centered below 八字 chart.
 
-Minimum viable product — what's needed to validate the concept.
+### 2.4 Loading State UX Rules
 
-- [ ] **Server API route** (`/api/chat`) — proxy to DeepSeek, keeps API key server-side
-- [ ] **Message input + send** — textarea with Enter-to-send and send button
-- [ ] **Streaming responses** — AI SDK `streamText` for real-time token display (low effort, high impact)
-- [ ] **Conversation display** — scrollable message list with user/assistant distinction
-- [ ] **Auto-scroll** — always show latest message
-- [ ] **Error handling** — show user-friendly error on API failure
-- [ ] **Loading/streaming state** — visual feedback while waiting
-
-### Add After Validation (v1.x)
-
-Features to add once core is working and validated.
-
-- [ ] **Markdown rendering** — `react-markdown` for proper AI response formatting
-- [ ] **Conversation persistence** — localStorage to survive page refresh
-- [ ] **Copy message button** — one-click copy for AI responses
-- [ ] **Clear/new conversation button** — start fresh without page reload
-- [ ] **Empty state / welcome message** — guide users on first visit
-- [ ] **Stop generation** — cancel mid-stream (AI SDK `stop()`)
-
-### Future Consideration (v2+)
-
-Features to defer until the chat is actually being used regularly.
-
-- [ ] **Code syntax highlighting** — adds bundle weight, only worth it if users frequently ask coding questions
-- [ ] **Responsive design polish** — basic Tailwind responsiveness is enough for v1
-- [ ] **System prompt configuration** — customize AI behavior (e.g., "you are a helpful assistant that speaks Chinese")
+1. **Never block input** — show input values clearly so user knows what was submitted
+2. **Show progress** — computed chart validates the system is working
+3. **Entertain** — 30-60s is long; roasts reduce abandonment
+4. **No spinner-only** — feels broken at this wait time
 
 ---
 
-## Feature Prioritization Matrix
+## 3. Report Rendering
 
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| Server API route | HIGH | MEDIUM | P1 |
-| Message input + send | HIGH | LOW | P1 |
-| Conversation display | HIGH | LOW | P1 |
-| Streaming responses | HIGH | LOW (with AI SDK) | P1 |
-| User/assistant styling | HIGH | LOW | P1 |
-| Auto-scroll to latest | MEDIUM | LOW | P1 |
-| Error handling | MEDIUM | LOW | P1 |
-| Loading state | MEDIUM | LOW | P1 |
-| Markdown rendering | HIGH | LOW | P2 |
-| Conversation persistence | MEDIUM | LOW | P2 |
-| Copy message button | LOW | LOW | P2 |
-| Clear conversation | LOW | LOW | P2 |
-| Empty state | LOW | LOW | P2 |
-| Stop generation | MEDIUM | LOW | P2 |
-| Code syntax highlighting | LOW | MEDIUM | P3 |
-| Responsive polish | LOW | LOW | P3 |
-| System prompt config | LOW | LOW | P3 |
+### 3.1 Dual-Report Structure
 
-**Priority key:**
-- P1: Must have for launch
-- P2: Should have, add when possible
-- P3: Nice to have, future consideration
+The tool produces **two versions simultaneously**, per the bazi-minimal workflow:
 
----
+#### 版本 A: 专业版 (Professional)
 
-## Key Technical Decisions
+| Section | Content | Style |
+|---------|---------|-------|
+| **Header** | 姓名(若提供), 性别, 出生年月时辰 | Simple |
+| **引言** | `四柱推演，三用合一。字字有据，不求惊人。` | Italic |
+| **四柱表格** | 年柱 月柱 日柱 时柱 with 天干地支 | Table |
+| **四视角分析** | 强弱/调候/格局/形象 | Headings |
+| **八步法细化** | 逐干逐支、神煞纳音、十干败亡诗 | Mixed |
+| **大运表** | 起运年龄, 10步大运 | Table |
+| **用神喜忌表** | 五行喜忌 | Table |
+| **结论** | Plain language summary | Paragraph |
 
-| Decision | Option A | Option B | Recommendation |
-|----------|----------|----------|----------------|
-| Chat SDK | Vercel AI SDK (`useChat`) | Hand-rolled fetch + state | **AI SDK** — handles streaming, state, errors out of the box. Saves ~200 lines of boilerplate |
-| DeepSeek integration | `@ai-sdk/deepseek` package | Raw `fetch` to DeepSeek API | **@ai-sdk/deepseek** — one-line provider setup, OpenAI-compatible handling |
-| State management | `useChat` hook (built-in) | `useState` + custom logic | **`useChat`** — manages messages, loading, errors, streaming |
-| Response format | Streaming (`streamText`) | Wait-for-complete (`generateText`) | **Streaming** — dramatically better UX, same implementation cost with AI SDK |
-| Persistence | `localStorage` | Database (SQLite/Postgres) | **localStorage** — zero infra, sufficient for personal tool |
-| Markdown | `react-markdown` | Raw text | **react-markdown** — AI responses are markdown by default |
-| Styling | Tailwind (existing) | Component library (shadcn) | **Tailwind only** — matches existing project style, no new deps |
+#### 版本 B: 详解版 (Plain Language)
 
----
+| Section | Content | Style |
+|---------|---------|-------|
+| **Header** | Same basic info | Simple |
+| **引言** | `不设门槛，不论根基。卷中每词皆有解。` | Italic |
+| **性格解读** | What kind of person is this? | Lead section |
+| **运势节奏** | How does fortune flow? | Narrative |
+| **方向建议** | What should they do? | Actionable |
+| **总结** | One-sentence plain language | Bold |
 
-## Competitor Feature Analysis
+### 3.2 Report Styling
 
-| Feature | ChatGPT | Claude.ai | Ours (v1) |
-|---------|---------|-----------|-----------|
-| Message input + send | ✓ | ✓ | ✓ |
-| Streaming | ✓ | ✓ | ✓ |
-| Conversation history | ✓ (DB) | ✓ (DB) | ✓ (localStorage) |
-| Markdown rendering | ✓ | ✓ | P2 |
-| Code highlighting | ✓ | ✓ | P3 |
-| Multi-model | ✓ | ✓ | ✗ (single DeepSeek) |
-| Auth | ✓ | ✓ | ✗ (no auth) |
-| Stop generation | ✓ | ✓ | P2 |
-| Copy message | ✓ | ✓ | P2 |
-| File upload | ✓ | ✓ | ✗ |
+**Typography:**
+- Headings: LXGW WenKai (楷体风格), warm serif feel
+- Body: LXGW WenKai or system serif
+- Tables: Clear borders, alternating row colors (subtle amber tint)
 
-**Our approach:** Minimal viable chat. ChatGPT/Claude are full products — we're building a single-feature tool for friends. Match on core interaction (send → stream → display), skip everything that requires infrastructure (auth, DB, multi-model).
+**Colors:**
+- Primary: `#8B0000` (deep red) for section markers
+- Background: warm off-white (`#fafaf8`)
+- Text: `#1a1a1a` (soft black)
+- Accent: amber/warm-stone scale from v2.0 design tokens
+
+**Layout:**
+- Max-width: ~720px for readability
+- Generous line-height (1.9)
+- 2em text-indent for paragraphs (formal feel)
+- Section dividers: subtle horizontal rules
+
+### 3.3 Report Display Rules
+
+1. **Scrollable** — report area takes remaining viewport height
+2. **Bottom input bar** — stays visible for re-submission
+3. **Tab toggle** — switch between 专业版/详解版 without scrolling
+4. **Re-submit clears** — new submission replaces previous report entirely
 
 ---
 
-## Sources
+## 4. Download Experience
 
-- Vercel AI SDK documentation — `useChat` hook, `streamText`, DeepSeek provider
-- `docs/architecture.md` — existing project architecture notes (GLM API approach documented)
-- `.planning/PROJECT.md` — current milestone requirements (DeepSeek API, `deepseek-v4-flash`)
-- Codebase assessment — greenfield Next.js 16 + React 19 + Tailwind 4, no existing API routes
+### 4.1 HTML Report Download
+
+**Trigger:** "下载报告" button, prominent but not blocking.
+
+**File format:** Self-contained HTML (no external dependencies).
+
+**Filename:** `八字报告_{姓名}_{日期}.html` or `八字报告_{公历日期}.html` if no name.
+
+**Implementation:**
+```javascript
+// Generate self-contained HTML with inline styles (from report-template.html)
+const blob = new Blob([htmlContent], { type: 'text/html' });
+const url = URL.createObjectURL(blob);
+window.open(url) or trigger download
+```
+
+### 4.2 HTML Template Requirements
+
+From `bazi-minimal/templates/report-template.html`:
+
+| Element | Style |
+|---------|-------|
+| Page | A4, 2cm margins |
+| H1 | 楷体, 26pt, centered, `#8B0000`, letter-spacing 6px |
+| H2 | Left border 4px solid `#8B0000`, light gray background |
+| Tables | Full width, `#999` borders, `#f0f0f0` header |
+| Signature | `—— 喵十七` right-aligned |
+| Footer | `以上内容仅供了解命理文化参考` centered, gray |
+
+### 4.3 Download UX
+
+| Aspect | Behavior |
+|--------|----------|
+| **Button state** | Disabled until report is loaded |
+| **Feedback** | Brief "正在生成下载..." state |
+| **File opens** | In new tab OR downloads based on browser preference |
+| **Content** | Both 专业版 and 详解版 in one HTML, separated by page break or clear dividers |
 
 ---
-*Feature research for: LLM Chat Interface (喵十七的工具箱)*
-*Researched: 2026-05-08*
+
+## 5. Input State Management
+
+### 5.1 Form State
+
+| State | Behavior |
+|-------|----------|
+| **Initial** | Empty form, placeholders visible |
+| **Filled** | Values retained until cleared |
+| **Re-submit** | Clears previous report, resets loading state |
+| **Validation error** | Highlight invalid fields, show message |
+
+### 5.2 Re-submit Flow
+
+```
+User submits → Loading state starts → Previous report cleared from DOM
+→ New report renders → Download button enabled
+```
+
+### 5.3 Edge Cases
+
+| Case | Handling |
+|------|----------|
+| **Unknown 时辰** | User selects "不确定" option. Report notes ⚠️ 时柱信息缺失，桃花/事业/晚运部分不确定 |
+| **Same八字 different命运** | Report notes: "时柱为信息盲区，同八字者因时柱不同而命运差异" |
+| **Future birth date** | Validation error, cannot submit |
+| **API failure** | Show error state: "分析失败，请重试" with retry button |
+| **Very long report** | Virtualized scrolling not needed; standard overflow-scroll is fine |
+
+---
+
+## 6. Feature Priority Matrix
+
+### Table Stakes (Must Have)
+
+| Feature | Why Expected | Complexity |
+|---------|--------------|------------|
+| Gregorian date input | Primary mode for most users | Low |
+| Gender selection | Required for 大运 direction + 六亲 | Low |
+| Loading animation | 30-60s wait needs engagement | Medium |
+| Report rendering | Core output | Medium |
+| HTML download | Takeaway value | Low |
+| Re-submit clears | Expected behavior | Low |
+
+### Differentiators (Valued)
+
+| Feature | Value Proposition | Complexity |
+|---------|---------------------|------------|
+| Lunar date input | Full lunar calendar support | High |
+| 八字 chart during load | Shows computation is working | Low |
+| Rotating 吐槽 | Entertainment during wait | Low |
+| Dual-report toggle | Serves both experts and novices | Medium |
+| LLM-generated name | Delightful default | Low |
+| Warm-minimalist design | Cohesive with project brand | Low |
+
+### Anti-Features (Explicitly Avoid)
+
+| Anti-Feature | Why Avoid | Instead |
+|--------------|-----------|---------|
+| PDF download | Chromium dependency, complex pipeline | HTML download is self-contained |
+| User accounts | No auth planned | Anonymous use |
+| Mobile app | Web-first, desktop only | Responsive web |
+| Multi-model switching | Single DeepSeek model | Focus on quality of one |
+
+---
+
+## 7. Component Inventory
+
+### 7.1 Input Components
+
+| Component | States | Notes |
+|-----------|--------|-------|
+| **DatePicker** | default, focused, filled, error | Gregorian mode |
+| **LunarDatePicker** | default, focused, filled, error | With lunar month/year/day |
+| **CalendarModeToggle** | 公历 selected, 农历 selected | Switches between modes |
+| **TimeSelector** | default, open, selected | 时辰 dropdown |
+| **GenderSelector** | none, male, female | Required |
+| **NameInput** | empty, filled, error | Optional, max 20 chars |
+
+### 7.2 Display Components
+
+| Component | States | Notes |
+|-----------|--------|-------|
+| **LoadingState** | active | Input echo + 八字 chart + rotating 吐槽 |
+| **ReportView** | professional, plain | Tab toggle between versions |
+| **ReportSection** | default | H2 + content structure |
+| **DataTable** | default | 五行喜忌, 大运, etc. |
+| **DownloadButton** | disabled, enabled, loading | Ready when report exists |
+
+### 7.3 Layout Components
+
+| Component | Purpose |
+|-----------|---------|
+| **SiteHeader** | Dark brand bar (existing from v2.0) |
+| **PageLayout** | Unified page wrapper (existing from v2.0) |
+| **BaziPageLayout** | Input at top, scrollable report middle, bottom input bar |
+| **InputBar** | Fixed at bottom, always visible for re-submit |
+
+---
+
+## 8. Technical Dependencies
+
+### 8.1 New Dependencies
+
+| Library | Purpose | Version |
+|---------|---------|---------|
+| `lunar-calendar` or similar | Lunar ↔ Gregorian conversion | Latest |
+| `dayjs` (if not already) | Date manipulation | Latest |
+
+### 8.2 Existing Reuse
+
+| Module | Source |
+|--------|--------|
+| DeepSeek API route | `src/app/api/chat/` |
+| AI SDK (useChat) | From `/chat` implementation |
+| Design tokens | `globals.css` from v2.0 |
+| UI components | `src/components/ui/` (Button, Card, Badge, Input) |
+| SiteHeader, PageLayout | `src/components/layout/` |
+
+---
+
+## 9. Sources
+
+- `.planning/PROJECT.md` — Project context, constraints, v2.0 design system
+- `bazi-minimal/SKILL.md` — Bazi analysis methodology (陆致极 + 韦千里), dual-report format
+- `bazi-minimal/rules/三部曲核心框架.md` — Framework details
+- `bazi-minimal/templates/report-template.html` — HTML report styling template

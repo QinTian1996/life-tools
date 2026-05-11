@@ -283,8 +283,367 @@ How roadmap phases should address these pitfalls.
 | XSS via markdown | Phase 2: Chat UI | Send prompt that returns `<script>alert(1)</script>`, verify sanitized |
 | No error/loading states | Phase 2: Chat UI | Disconnect network mid-stream, verify graceful partial + retry |
 
+## Bazi-Specific Pitfalls (v3.0)
+
+Pitfalls specific to the 八字命理工具 project.
+
+---
+
+### Pitfall B1: XSS via LLM-Generated HTML
+
+**What goes wrong:** LLM output rendered with `dangerouslySetInnerHTML` without sanitization enables arbitrary JavaScript execution.
+
+**Why it happens:**
+- AI assistants frequently generate code using `dangerouslySetInnerHTML` for rich content
+- Tutorials simplify by skipping sanitization
+- React's `dangerouslySetInnerHTML` bypasses React's default escaping
+
+**Consequences:**
+- Session hijacking, data theft, unauthorized actions
+- Critical severity per OWASP XSS patterns
+- Particularly dangerous because LLM output is "trusted" content
+
+**Prevention:**
+1. **ALWAYS sanitize LLM HTML output** with DOMPurify before rendering:
+   ```tsx
+   import DOMPurify from 'dompurify';
+
+   const sanitized = DOMPurify.sanitize(llmHtmlContent, {
+     ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
+     ALLOWED_ATTR: [],
+   });
+   return <div dangerouslySetInnerHTML={{ __html: sanitized }} />;
+   ```
+
+2. **Use Trusted Types** as defense-in-depth:
+   ```tsx
+   const ttPolicy = window.trustedTypes?.createPolicy('bazi-report', {
+     createHTML: (string) => DOMPurify.sanitize(string),
+   });
+   ```
+
+3. **If using react-markdown with rehype-raw**, you MUST add rehype-sanitize:
+   ```tsx
+   rehypePlugins={[rehypeRaw, rehypeSanitize]}
+   ```
+
+**Detection:**
+- Search for `dangerouslySetInnerHTML` without prior `DOMPurify.sanitize()` call
+- Test with payload: `<script>alert('XSS')</script>`
+
+**Phase:** Phase 2 (报告渲染) — XSS sanitization must be implemented alongside HTML rendering
+
+---
+
+### Pitfall B2: Chinese Calendar Conversion Accuracy
+
+**What goes wrong:** Wrong lunar date or incorrect 天干地支 (Heavenly Stems/Earthly Branches) calculation, especially around Chinese New Year and leap months.
+
+**Why it happens:**
+- Lunar calendar libraries have known bugs with gzYear (year stem-branch) calculation around solar terms
+- `solarlunar` has documented issues with gzYear for dates before Lichun (立春, ~Feb 4)
+- Leap month handling is complex — some libraries return wrong results
+- JS `Date` month is 0-indexed, causing off-by-one errors
+
+**Consequences:**
+- Wrong birth chart (四柱) = fundamentally flawed reading
+- User trust destroyed
+
+**Prevention:**
+1. **Use `lunar-javascript` (6tail)** — more comprehensive, 1K stars, actively maintained
+   ```bash
+   npm install lunar-javascript
+   ```
+
+2. **Verify output against known values:**
+   - Jan 25, 2020 should be 己亥 year (before Lichun), not 庚子
+   - Test leap month handling explicitly
+
+3. **Avoid JS Date month indexing bugs:**
+   ```js
+   // WRONG: Date uses 0-indexed months
+   new Date(2024, 9, 1) // Actually October!
+
+   // Use named constants or helpers
+   const month = 9; // September
+   new Date(2024, month - 1, 1);
+   ```
+
+4. **Cross-validate critical calculations** with a second library or lookup table for edge cases
+
+**Detection:**
+- Unit tests with known-good date pairs
+- Test around Chinese New Year boundary
+- Test leap month years (2023 had a leap month)
+
+**Phase:** Phase 1 (八字排盘) — Calendar conversion is the foundation, accuracy is non-negotiable
+
+---
+
+### Pitfall B3: LLM Stream Abort Handling Bugs
+
+**What goes wrong:** Stream aborts trigger wrong callbacks, memory leaks, or no cleanup.
+
+**Why it happens:**
+- AI SDK's `onFinish` is NOT called when stream aborts without `consumeStream`
+- Short abort signals (<1000ms) trigger `onError` instead of `onAbort`
+- Abort breaks stream resumption (`resume: true` conflicts with abort)
+
+**Consequences:**
+- Partial results not saved
+- Resource leaks
+- Confusing error messages to users
+
+**Prevention:**
+1. **Always pass `consumeStream`** for proper abort handling:
+   ```tsx
+   import { consumeStream } from 'ai';
+
+   return result.toUIMessageStreamResponse({
+     onFinish: async ({ isAborted }) => {
+       if (isAborted) {
+         // Handle abort cleanup
+       }
+     },
+     consumeSseStream: consumeStream,
+   });
+   ```
+
+2. **Handle abort in onError as fallback:**
+   ```tsx
+   onError: (error) => {
+     if (error instanceof Error && error.name === 'AbortError') {
+       handleAbort();
+     } else {
+       handleRealError(error);
+     }
+   },
+   ```
+
+3. **Use AbortController for client-side cancel:**
+   ```tsx
+   const { stop, isLoading } = useChat({
+     onFinish: (message) => { /* save result */ }
+   });
+
+   <button onClick={stop} disabled={!isLoading}>取消</button>
+   ```
+
+4. **Don't use `resume: true`** if you need abort functionality
+
+**Phase:** Phase 2 (AI 命理分析) — Stream handling is core to the waiting experience
+
+---
+
+### Pitfall B4: HTML Download Missing Chinese Fonts
+
+**What goes wrong:** PDF/HTML download shows tofu boxes (□) for Chinese characters on user machine.
+
+**Why it happens:**
+- Server/renderer may not have Chinese fonts installed
+- CSS `@font-face` with external URLs fails in offline contexts
+- Font subsetting issues when embedding
+
+**Consequences:**
+- Unreadable report
+- User can't use the core deliverable
+
+**Prevention:**
+1. **Use self-contained fonts via base64 embedding:**
+   ```html
+   <style>
+   @font-face {
+     font-family: 'WenQuanYi';
+     src: url('data:font/woff2;base64,...') format('woff2');
+   }
+   body { font-family: 'WenQuanYi', 'Noto Sans CJK SC', sans-serif; }
+   </style>
+   ```
+
+2. **Or use Google Fonts with unicode-range optimization:**
+   ```html
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap">
+   ```
+
+3. **For Playwright PDF generation, wait for fonts:**
+   ```js
+   await page.goto(url);
+   await page.evaluate(() => document.fonts.ready);
+   await page.pdf({ path: 'report.pdf' });
+   ```
+
+4. **Use proven font stack** (from existing `report-template.html`):
+   ```css
+   font-family: 'WenQuanYi Zen Hei', 'Noto Sans CJK SC', 'Source Han Sans SC', serif;
+   ```
+
+**Detection:**
+- Test download on clean VM without Chinese fonts
+- Check PDF with `pdffonts` tool for embedding
+
+**Phase:** Phase 3 (HTML 报告下载) — Font embedding is core to the feature
+
+---
+
+### Pitfall B5: Carousel Causing CLS and Accessibility Violations
+
+**What goes wrong:** Autoplay carousel causes Cumulative Layout Shift, janky animations, and accessibility violations.
+
+**Why it happens:**
+- Non-composited animations (animating `left`, `top`, `margin`) trigger layout recalculations
+- Large assets loaded via JS delay LCP
+- Animations conflict with user scroll
+- No pause control violates WCAG 2.2.2
+
+**Consequences:**
+- Poor Core Web Vitals (CLS, LCP)
+- Frustrating experience for users with vestibular disorders
+- Accessibility violations
+
+**Prevention:**
+1. **Prefer CSS Scroll Snap** over JS libraries:
+   ```css
+   .carousel-track {
+     overflow-x: auto;
+     scroll-snap-type: x mandatory;
+     scroll-behavior: smooth;
+   }
+   .carousel-slide {
+     scroll-snap-align: center;
+   }
+   ```
+
+2. **Use CSS transforms only:**
+   ```css
+   /* WRONG - causes layout */
+   .slide { left: -100%; transition: left 0.5s; }
+
+   /* CORRECT - compositor-only */
+   .slide { transform: translateX(-100%); transition: transform 0.5s; }
+   ```
+
+3. **Honor reduced motion:**
+   ```css
+   @media (prefers-reduced-motion: reduce) {
+     .carousel { animation: none; }
+   }
+   ```
+
+4. **Provide accessible controls:**
+   - Pause/Stop button (WCAG 2.2.2)
+   - Keyboard navigation (arrow keys)
+   - Visible focus indicators
+   - Proper ARIA: `role="region"`, `aria-roledescription="carousel"`
+
+5. **Keep text and images separate** — don't bake text into images
+
+**Detection:**
+- Lighthouse CLS audit
+- `prefers-reduced-motion` test
+- Keyboard-only navigation test
+
+**Phase:** Phase 2 (等待动画) — Animation is core to waiting experience; must be accessible
+
+---
+
+### Pitfall B6: Form State Lost on Failed Submit
+
+**What goes wrong:** User submits form, request fails, form resets and user loses all input.
+
+**Why it happens:**
+- React 19 default: forms reset after submission (successful or not)
+- React Hook Form `setError` can invalidate form preventing resubmit
+- Server errors clear form state
+
+**Consequences:**
+- Terrible UX — user must re-enter everything
+- Users abandon the tool
+
+**Prevention:**
+1. **Return submitted data on failure:**
+   ```tsx
+   async function action(prevState, formData) {
+     const result = await submitToAPI(formData);
+     if (!result.success) {
+       return { error: result.error, payload: formData };
+     }
+     return { success: true };
+   }
+   ```
+
+2. **Use returned data to restore form:**
+   ```tsx
+   const [state, formAction] = useActionState(action, {});
+
+   return (
+     <form action={formAction}>
+       <input
+         name="name"
+         defaultValue={state.payload?.get('name') || ''}
+       />
+       {state.error && <p>{state.error}</p>}
+     </form>
+   );
+   ```
+
+3. **For clear-on-resubmit behavior** (as specified in requirements):
+   - Explicitly call `reset()` after successful submit
+   - This is the intended behavior — form clears after successful report generation
+
+**Detection:**
+- Test submission with network failure (DevTools → Network → Offline)
+- Test submission with server 500 error
+
+**Phase:** Phase 1 (输入表单) — Form behavior is fundamental UX
+
+---
+
+## Quick Reference: AI SDK Abort Handling
+
+```tsx
+// CORRECT: Full abort handling
+const result = streamText({
+  model: deepseek('deepseek-v4-flash'),
+  messages,
+  abortSignal: req.signal,
+});
+
+return result.toUIMessageStreamResponse({
+  onFinish: async ({ isAborted }) => {
+    if (isAborted) {
+      console.log('Stream aborted');
+      // Cleanup partial results
+    }
+  },
+  consumeSseStream: consumeStream, // REQUIRED for abort handling
+  onError: (error) => {
+    if (error.name === 'AbortError') {
+      handleAbort();
+    } else {
+      throw error;
+    }
+  },
+});
+```
+
+---
+
+## Bazi Pitfall Phase Mapping
+
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| XSS via LLM HTML | Phase 2 (报告渲染) | Test with `<script>alert(1)</script>` payload |
+| Calendar accuracy | Phase 1 (八字排盘) | Verify dates around CNY and leap months |
+| Stream abort handling | Phase 2 (AI 命理分析) | Test cancel during streaming |
+| Chinese fonts in download | Phase 3 (HTML 下载) | Test on clean VM |
+| Carousel accessibility | Phase 2 (等待动画) | Keyboard nav + reduced-motion test |
+| Form state on failure | Phase 1 (输入表单) | Network offline test |
+
+---
+
 ## Sources
 
+### Original LLM Chat Pitfalls
 - Fordel Studios: "How to Add Streaming AI to Your Next.js App Without a Surprise API Bill" (2026-04)
 - Vladimir Siedykh: "Production AI Streaming Next.js: Bulletproof Patterns" (2025-09)
 - Eaures: "Streaming LLM Responses in Next.js with SSE (No Timeouts)" (2025-08)
@@ -294,6 +653,10 @@ How roadmap phases should address these pitfalls.
 - Masaki Hirokawa / Claude Lab: "Three Hidden Pitfalls When Implementing Claude API Streaming" (2026-04)
 - GetStream: "Adding AI Chat Features to a Modern Next.js Application" (2024-11)
 
----
-*Pitfalls research for: LLM Chat Interface (DeepSeek API, Next.js 16)*
-*Researched: 2026-05-08*
+### Bazi-Specific Pitfalls
+- **XSS patterns:** redteams.ai (2026-03-20), Snyk Labs (2023-10-19), Vercel AI SDK docs
+- **Calendar libraries:** lunar-javascript GitHub issues (2024-2025), solarlunar issues (2019-2024)
+- **AI SDK abort:** Vercel AI SDK docs - "Stopping Streams", "onFinish not called when stream is aborted"
+- **Chinese fonts in PDF:** pdf4.dev (2026-04-26), wkhtmltopdf GitHub issues, CSDN blogs
+- **Carousel accessibility:** web.dev patterns, Chrome for Developers blog (2026), Smashing Magazine (2023)
+- **Form state:** Robin Wieruch (2024-11), react-hook-form docs, Aurora Scharff (2024-10)

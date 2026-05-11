@@ -1,417 +1,487 @@
-# Architecture Research
+# Architecture: 八字命理工具 (Bazi Feature)
 
-**Domain:** LLM Chat Feature (DeepSeek) in Next.js App Router
-**Researched:** 2026-05-08
-**Confidence:** HIGH
+**Domain:** Bazi (八字) fortune-telling tool with LLM-powered report generation
+**Project:** life-tools (喵十七的工具箱)
+**Date:** 2026-05-11
+**Confidence:** HIGH (based on existing codebase analysis)
 
-## Standard Architecture
+---
 
-### System Overview
+## Executive Summary
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Browser / Client                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │  ChatPage     │  │  ChatUI      │  │  useChat      │       │
-│  │  (RSC entry)  │  │  (client)    │  │  (hook)       │       │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘       │
-│         │                  │                  │               │
-│         │     useState/useRef for messages    │               │
-│         └──────────────────┴──────────────────┘               │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ POST /api/chat (SSE stream)
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Next.js API Route                          │
-│              src/app/api/chat/route.ts                       │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  POST handler:                                       │    │
-│  │  1. Parse messages from request body                  │    │
-│  │  2. Call DeepSeek API (stream: true)                  │    │
-│  │  3. Pipe SSE chunks → ReadableStream → Response       │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ HTTPS (streaming)
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    DeepSeek API                               │
-│            https://api.deepseek.com/chat/completions          │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  OpenAI-compatible chat endpoint                      │    │
-│  │  Auth: Bearer DEEPSEEK_API_KEY                        │    │
-│  │  SSE: data: {...}\n\n  →  data: [DONE]               │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-```
+The Bazi feature integrates with the existing Next.js 16 + React 19 + Tailwind CSS 4 stack using a **form → API → report** data flow. The API route computes 四柱八字 (Four Pillars) and 大运 (Decade Luck Cycles), then generates dual-format reports (professional + plain-language) via DeepSeek LLM. The existing chat streaming pattern is **not reused** directly; instead, a non-streaming API route handles the longer Bazi report generation, while a separate client-side timer drives the "吐槽轮播" loading animation.
 
-### Component Responsibilities
+---
 
-| Component | Responsibility | Implementation |
-|-----------|----------------|----------------|
-| `ChatPage` | Route entry, loads client shell | Server Component at `src/app/chat/page.tsx` |
-| `ChatUI` | Message list + input + send button | Client Component (`"use client"`) |
-| `useChat` | Chat state, fetch, stream parsing | Custom React hook |
-| `API Route` | Proxy to DeepSeek, stream forward | `src/app/api/chat/route.ts` POST handler |
-| DeepSeek API | LLM inference, streaming response | External service, server-side only |
+## Integration Points
 
-## Recommended Project Structure
+### Existing Infrastructure to Reuse
+
+| Component | Path | Reuse Pattern |
+|-----------|------|---------------|
+| PageLayout | `src/components/layout/PageLayout.tsx` | Wrap Bazi page content |
+| SiteHeader | `src/components/layout/SiteHeader.tsx` | Already included in PageLayout |
+| Button | `src/components/ui/Button.tsx` | Form submit button, download button |
+| Card | `src/components/ui/Card.tsx` | Report container |
+| Input | `src/components/ui/Input.tsx` | Form fields |
+| Design tokens | `src/app/globals.css` | CSS variables for theming |
+| DeepSeek API | `src/app/api/chat/route.ts` pattern | `@ai-sdk/deepseek` provider |
+
+### New Files Required
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx              # Root layout (existing)
-│   ├── page.tsx                # Home page (existing, add /chat link)
-│   ├── globals.css             # Global styles (existing)
-│   ├── chat/
-│   │   └── page.tsx            # Chat page (thin RSC wrapper)
+│   ├── bazi/
+│   │   └── page.tsx                    # Bazi page component
 │   └── api/
-│       └── chat/
-│           └── route.ts        # DeepSeek streaming proxy
+│       └── bazi/
+│           └── route.ts                # Bazi computation + LLM report API
 ├── components/
-│   └── chat/
-│       ├── ChatUI.tsx          # Main chat client component
-│       ├── MessageList.tsx     # Scrollable message display
-│       ├── MessageBubble.tsx   # Single message rendering
-│       └── ChatInput.tsx       # Text input + send button
-└── hooks/
-    └── useChat.ts              # Chat state & streaming logic
+│   └── bazi/
+│       ├── BaziForm.tsx                # Input form (birth date, time, gender, name)
+│       ├── BaziReport.tsx              # Report display (scrollable)
+│       ├── BaziLoading.tsx             # Loading animation (吐槽轮播)
+│       └── BaziDownload.tsx             # HTML download button
+└── lib/
+    └── bazi/
+        ├── calendar.ts                 # Gregorian ↔ Lunar conversion
+        ├── calculator.ts                # 四柱排盘 + 大运计算
+        └── prompt.ts                    # LLM prompt templates (专业版/详解版)
 ```
 
-### Structure Rationale
-
-- **`app/chat/page.tsx`:** Minimal server component — just renders `<ChatUI />`. Keeps the page as a thin shell per Next.js convention.
-- **`components/chat/`:** All UI components are client components. Grouped by feature (`chat/`) for cohesion.
-- **`hooks/useChat.ts`:** Extracts all streaming/state logic from UI. The hook owns message array, loading state, error state, and the fetch-stream pipeline.
-- **`app/api/chat/route.ts`:** Single API route. No service layer needed — this is a simple proxy. If logic grows, extract to `lib/deepseek.ts`.
-
-## Architectural Patterns
-
-### Pattern 1: Server-Side API Proxy
-
-**What:** The API route acts as a proxy between client and DeepSeek. The client never sees the API key.
-
-**When to use:** Always. API keys must stay server-side. The route also allows adding rate limiting, logging, or request transformation later.
-
-**Trade-offs:** Extra network hop (client → Next.js → DeepSeek) adds ~50ms latency. Acceptable for chat UX since streaming masks this.
-
-```typescript
-// app/api/chat/route.ts
-export async function POST(request: Request) {
-  const { messages } = await request.json()
-
-  // Validate before streaming — status code can't change once stream starts
-  if (!messages || !Array.isArray(messages)) {
-    return Response.json({ error: "messages required" }, { status: 400 })
-  }
-
-  const response = await fetch("https://api.deepseek.com/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "deepseek-chat",
-      messages,
-      stream: true,
-    }),
-  })
-
-  // Forward DeepSeek's SSE stream directly — no parsing needed server-side
-  return new Response(response.body, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-    },
-  })
-}
-```
-
-### Pattern 2: Client-Side Stream Consumption via Custom Hook
-
-**What:** A `useChat` hook encapsulates all streaming logic — fetch, parse SSE chunks, update state. Components just consume the hook's return value.
-
-**When to use:** Any streaming chat UI. Keeps components pure and testable.
-
-**Trade-offs:** Hook becomes the "god object" for chat state. For this project's scope (single chat, no history persistence), this is fine. If multi-conversation support is added later, extract to a context/store.
-
-```typescript
-// hooks/useChat.ts — simplified core logic
-export function useChat() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isStreaming, setIsStreaming] = useState(false)
-  const abortRef = useRef<AbortController | null>(null)
-
-  const send = useCallback(async (content: string) => {
-    const userMessage: Message = { role: "user", content }
-    const updatedMessages = [...messages, userMessage]
-    setMessages(updatedMessages)
-    setIsStreaming(true)
-
-    const assistantMessage: Message = { role: "assistant", content: "" }
-    setMessages([...updatedMessages, assistantMessage])
-
-    const abortController = new AbortController()
-    abortRef.current = abortController
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages }),
-        signal: abortController.signal,
-      })
-
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      if (!response.body) throw new Error("No response body")
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ""
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split("\n")
-        buffer = lines.pop() ?? ""
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue
-          const data = line.slice(6)
-          if (data === "[DONE]") break
-
-          try {
-            const parsed = JSON.parse(data)
-            const delta = parsed.choices?.[0]?.delta?.content
-            if (delta) {
-              assistantMessage.content += delta
-              setMessages([...updatedMessages, { ...assistantMessage }])
-            }
-          } catch { /* skip malformed chunks */ }
-        }
-      }
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return
-      // Handle error state
-    } finally {
-      setIsStreaming(false)
-    }
-  }, [messages])
-
-  const stop = useCallback(() => abortRef.current?.abort(), [])
-
-  return { messages, isStreaming, send, stop }
-}
-```
-
-### Pattern 3: Direct Stream Forwarding (No Server-Side Parse)
-
-**What:** The API route pipes DeepSeek's raw SSE response directly to the client without parsing. Only the client parses SSE chunks.
-
-**When to use:** Simple proxy scenarios where no server-side transformation is needed.
-
-**Trade-offs:** Client must handle DeepSeek's specific SSE format. If you later need server-side logging of tokens or content filtering, you'll need to parse server-side (switch to Pattern 4).
-
-### Pattern 4: Server-Side Stream Transform (Future)
-
-**What:** Server parses DeepSeek SSE chunks, transforms/reformats, then streams to client.
-
-**When to use:** When you need server-side content filtering, logging, token counting, or reformatting (e.g., stripping `reasoning_content` from DeepSeek thinking mode).
-
-**Trade-offs:** Higher server CPU/memory. More complex error handling (must handle errors in both upstream and downstream).
+---
 
 ## Data Flow
 
-### Chat Message Flow
-
 ```
-User types message
-       ↓
-ChatInput calls send(content)
-       ↓
-useChat hook:
-  1. Appends user message to state
-  2. Appends empty assistant message
-  3. POST /api/chat { messages: [...] }
-       ↓
-API Route (server):
-  1. Validates request
-  2. Reads DEEPSEEK_API_KEY from env
-  3. POST https://api.deepseek.com/chat/completions
-       ↓
-DeepSeek responds with SSE stream:
-  data: {"choices":[{"delta":{"content":"Hello"}}]}
-  data: {"choices":[{"delta":{"content":" world"}}]}
-  data: [DONE]
-       ↓
-API Route forwards stream to client
-       ↓
-useChat hook:
-  1. Reads chunks via ReadableStream reader
-  2. Parses SSE lines (data: prefix)
-  3. Extracts delta.content from each chunk
-  4. Appends to assistant message → triggers re-render
-       ↓
-MessageList displays updated messages
-```
-
-### State Management
-
-```
-useChat hook (local state)
-  ├── messages: Message[]          ← append-only, immutable updates
-  ├── isStreaming: boolean         ← loading indicator
-  ├── abortRef: AbortController    ← cancel in-flight request
-  └── error: string | null         ← display errors
-
-No global state needed — single chat session, no persistence.
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           USER FLOW                                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌──────────┐     ┌──────────────┐     ┌─────────────────────────────┐  │
+│  │  Form    │────▶│  API Route   │────▶│  Report State               │  │
+│  │  Input   │     │  /api/bazi   │     │  (dual-format content)      │  │
+│  └──────────┘     └──────────────┘     └─────────────────────────────┘  │
+│       │                   │                           │                 │
+│       │                   │                           ▼                 │
+│       │                   │              ┌─────────────────────────┐     │
+│       │                   │              │  BaziReport Component   │     │
+│       │                   │              │  (scrollable main area) │     │
+│       │                   │              └─────────────────────────┘     │
+│       │                   │                           │                   │
+│       │                   │                           ▼                   │
+│       │                   │              ┌─────────────────────────┐     │
+│       │                   │              │  Re-submit clears old  │     │
+│       │                   │              │  report, shows form    │     │
+│       │                   │              └─────────────────────────┘     │
+│       │                   │                                                │
+│       │                   ▼                                                │
+│       │         ┌──────────────────┐                                      │
+│       │         │   DeepSeek LLM   │                                      │
+│       │         │  (streamText)     │                                      │
+│       │         └──────────────────┘                                      │
+│       │                   │                                                │
+│       ▼                   ▼                                                │
+│  ┌──────────────────────────────┐                                        │
+│  │     BaziLoading State        │                                        │
+│  │  • Input echo                │                                        │
+│  │  • 四柱 display              │                                        │
+│  │  • 吐槽轮播 (5s intervals)  │                                        │
+│  └──────────────────────────────┘                                        │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Key Data Flows
+### API Route Design: `/api/bazi`
 
-1. **User → Assistant:** User types → `send()` → API route → DeepSeek → SSE stream → hook parses → state update → re-render
-2. **Stream Cancellation:** User clicks stop → `abortRef.current.abort()` → fetch cancels → reader stops → `isStreaming = false`
-3. **Error Path:** DeepSeek API error → API route returns error JSON (before stream) OR stream contains error → hook catches → sets error state → UI shows error
+**Decision: Non-streaming API route**
 
-## Component Design for Downstream Consumer
+Rationale:
+- Bazi report is a long-form document (~2000-4000 tokens), not a conversation
+- The "吐槽轮播" loading animation runs client-side via `setInterval`
+- Server doesn't need to stream chunks; complete report in one response
+- Simpler error handling and retry logic
 
-### Page Component: `src/app/chat/page.tsx`
-
+**Request:**
 ```typescript
-import { ChatUI } from "@/components/chat/ChatUI"
-
-export default function ChatPage() {
-  return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100">
-      <ChatUI />
-    </main>
-  )
+interface BaziRequest {
+  birthDate: string;        // "1995-04-02" (Gregorian)
+  birthTime: string;        // "09:30" (24-hour format)
+  calendarType: "solar" | "lunar";
+  gender: "male" | "female";
+  name?: string;             // Optional, LLM generates if missing
 }
 ```
 
-### Main Client Component: `src/components/chat/ChatUI.tsx`
-
+**Response:**
 ```typescript
-"use client"
+interface BaziResponse {
+  // Computed Bazi data
+  四柱: {
+    年柱: string;  // e.g., "乙亥"
+    月柱: string;  // e.g., "庚辰"
+    日柱: string;  // e.g., "丙午"
+    时柱: string;  // e.g., "甲午"
+  };
+  大运: Array<{ age: number; ganZhi: string }>;
 
-import { useChat } from "@/hooks/useChat"
-import { MessageList } from "./MessageList"
-import { ChatInput } from "./ChatInput"
+  // LLM-generated reports
+  reports: {
+    professional: string;   // Markdown, full technical analysis
+    plain: string;           // Markdown, plain language for普通人
+  };
 
-export function ChatUI() {
-  const { messages, isStreaming, send, stop } = useChat()
-
-  return (
-    <div className="flex flex-col h-screen max-w-3xl mx-auto">
-      <header className="p-4 border-b">喵十七聊天助手</header>
-      <MessageList messages={messages} isStreaming={isStreaming} />
-      <ChatInput onSend={send} onStop={stop} isStreaming={isStreaming} />
-    </div>
-  )
+  // Metadata
+  input: BaziRequest;
+  generatedAt: string;
 }
 ```
 
-### Message Types
+---
+
+## Component Tree
+
+```
+src/app/bazi/page.tsx
+├── PageLayout
+│   └── BaziPage (client component, 'use client')
+│       ├── State: { status: 'form' | 'loading' | 'report' }
+│       ├── State: { formData, baziData, reports }
+│       │
+│       ├── [status === 'form']
+│       │   └── BaziForm
+│       │       ├── CalendarTypeToggle (公历/农历 switch)
+│       │       ├── DateInput (date picker)
+│       │       ├── TimeInput (time picker)
+│       │       ├── GenderSelect (男/女)
+│       │       ├── NameInput (optional)
+│       │       └── SubmitButton → triggers API call + status change
+│       │
+│       ├── [status === 'loading']
+│       │   └── BaziLoading
+│       │       ├── InputEcho (回显用户输入)
+│       │       ├── SiZhuDisplay (四柱初步结果)
+│       │       └── TouCaoCarousel (吐槽轮播, setInterval-driven)
+│       │
+│       └── [status === 'report']
+│           └── BaziReport
+│               ├── ReportTabs (专业版 | 详解版)
+│               ├── ReportContent (scrollable markdown)
+│               ├── DownloadButton (HTML download)
+│               └── NewAnalysisButton (重新分析 → status = 'form')
+```
+
+---
+
+## State Management
+
+### React State (useState, no external library needed)
 
 ```typescript
-// hooks/useChat.ts
-export interface Message {
-  role: "user" | "assistant" | "system"
-  content: string
+// Simple linear state machine
+type Status = 'form' | 'loading' | 'report';
+
+const [status, setStatus] = useState<Status>('form');
+const [formData, setFormData] = useState<BaziRequest | null>(null);
+const [baziResult, setBaziResult] = useState<BaziResponse | null>(null);
+const [error, setError] = useState<string | null>(null);
+
+// Flow:
+// 1. User fills form → setFormData
+// 2. Submit → setStatus('loading'), call API
+// 3. API returns → setBaziResult, setStatus('report')
+// 4. Re-submit → setStatus('form'), clear baziResult
+```
+
+**Why no Zustand/Redux:**
+- Linear data flow (form → loading → report)
+- No complex cross-component state sharing
+- React state sufficient for this use case
+
+---
+
+## HTML Download: Server-Side Generation
+
+**Decision: Generate HTML in API route, return as downloadable file**
+
+```typescript
+// In /api/bazi/route.ts
+export async function POST(req: Request) {
+  // 1. Compute 四柱 + 大运
+  // 2. Generate reports via LLM (streamText, wait for completion)
+  // 3. Convert markdown → HTML using simple transformer
+  // 4. Return as Response with Content-Disposition header
+
+  const html = generateHtmlReport(reports, metadata);
+
+  return new Response(html, {
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Disposition': `attachment; filename="八字报告_${name}_${date}.html"`,
+    },
+  });
 }
 ```
 
-## Build Order (Dependency-Aware)
+**Alternative considered: Client-side Blob download**
+- Rejected because server-side allows consistent styling via template
+- The skill's pandoc workflow suggests server-side is the intended approach
+- Simpler to debug and test
 
-| Order | Component | Depends On | Reason |
-|-------|-----------|------------|--------|
-| 1 | `types` (Message interface) | None | Foundation type used everywhere |
-| 2 | `useChat` hook | types | Core logic — can test independently |
-| 3 | `MessageBubble` | types | Pure presentational, no deps |
-| 4 | `MessageList` | MessageBubble | Renders list of bubbles |
-| 5 | `ChatInput` | None | Pure presentational with callback |
-| 6 | `ChatUI` | useChat, MessageList, ChatInput | Assembles all pieces |
-| 7 | `api/chat/route.ts` | None | Server-side, independent |
-| 8 | `chat/page.tsx` | ChatUI | RSC wrapper, last to build |
-| 9 | Home page update | None | Add /chat link to existing page |
+**HTML Template Strategy:**
+- Use a simple HTML template with embedded CSS (warm minimalist theme)
+- No external dependencies (no pandoc needed for HTML, only for PDF)
+- 楷体/KaiTi font for headings, proper Chinese character support
 
-## Scaling Considerations
+---
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 1-10 concurrent users | Current architecture is fine. No changes needed. |
-| 10-100 concurrent users | Add request timeout (30s) to API route. Consider `maxDuration` config. |
-| 100+ concurrent users | Add rate limiting middleware. Consider queue for DeepSeek requests. |
+## Loading Animation: Client-Side Timer
 
-### Scaling Priorities
+The "吐槽轮播" (joke rotation) runs client-side during the API call:
 
-1. **First bottleneck:** DeepSeek API rate limits. Fix: Add client-side debounce, server-side rate limiting.
-2. **Second bottleneck:** Long conversations exceed token limits. Fix: Implement message truncation or summarization in the API route.
+```typescript
+// In BaziLoading component
+const [currentJoke, setCurrentJoke] = useState(0);
 
-## Anti-Patterns
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentJoke((prev) => (prev + 1) % jokes.length);
+  }, 5000);
 
-### Anti-Pattern 1: Exposing API Key to Client
+  return () => clearInterval(interval);
+}, []);
+```
 
-**What people do:** Call DeepSeek directly from the browser with the API key in a `REACT_APP_` or `NEXT_PUBLIC_` env var.
-**Why it's wrong:** Anyone can steal the key from browser dev tools.
-**Do this instead:** Always route through `/api/chat` server-side. Keep `DEEPSEEK_API_KEY` server-only (no `NEXT_PUBLIC_` prefix).
+**Why client-side:**
+- Timer doesn't need server coordination
+- Creates smooth UX independent of API latency variance
+- Allows fade-in/fade-out CSS transitions
 
-### Anti-Pattern 2: Buffering the Full Response Before Displaying
+---
 
-**What people do:** `await response.json()` the full DeepSeek response, then display it all at once.
-**Why it's wrong:** Users stare at a loading spinner for 5-30 seconds while the full response generates.
-**Do this instead:** Stream the response. Show each token as it arrives. Use `ReadableStream` + `TextDecoder` on the client.
+## Calendar Conversion Utility
 
-### Anti-Pattern 3: Using `EventSource` for POST Requests
+**Location:** `src/lib/bazi/calendar.ts`
 
-**What people do:** Use `new EventSource('/api/chat')` for SSE consumption.
-**Why it's wrong:** `EventSource` only supports GET requests. Chat needs POST to send message history in the body.
-**Do this instead:** Use `fetch()` with `response.body.getReader()` — supports POST + streaming.
+**Requirements:**
+- Gregorian → Lunar conversion
+- Lunar → Gregorian conversion
+- Solar term (节气) awareness for month boundaries
 
-### Anti-Pattern 4: Stale Closure in Streaming State Updates
+**Implementation approach:**
+- Use `lunar-converter` or similar npm package if available
+- Fallback: API calls to `nongli114.com` or `iamwanna.cn` (see skill doc)
+- Solar term lookup table hardcoded (24 节气)
 
-**What people do:** Mutate state directly inside the streaming loop (`messages.push(newMsg)`).
-**Why it's wrong:** React won't detect the mutation. The UI won't update.
-**Do this instead:** Create new array references each time: `setMessages([...prev, updated])`. Use the functional form `setMessages(prev => [...])` for safety.
+**Public API:**
+```typescript
+interface CalendarConverter {
+  lunarToGregorian(year: number, month: number, day: number): Date;
+  gregorianToLunar(date: Date): { year: number; month: number; day: number };
+  getSolarTerm(year: number, month: number): string | null; // e.g., "立春"
+  isLeapMonth(year: number, month: number): boolean;
+}
+```
 
-## Integration Points
+---
 
-### External Services
+## Bazi Calculator Core
 
-| Service | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| DeepSeek API | Server-side fetch (OpenAI-compatible) | Base URL: `https://api.deepseek.com`. Bearer token auth. SSE streaming via `stream: true`. |
+**Location:** `src/lib/bazi/calculator.ts`
 
-### Internal Boundaries
+**Computations required:**
+1. 四柱排盘 (年柱、月柱、日柱、时柱)
+2. 大运计算 (起运年龄、顺逆排)
+3. 十神判定
+4. 调候计分
 
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| ChatUI ↔ useChat | Hook return value (state + callbacks) | Unidirectional data flow — UI never mutates state directly |
-| useChat ↔ API Route | `fetch` POST with SSE response | Standard HTTP, no WebSocket needed |
-| API Route ↔ DeepSeek | Server-side `fetch` with Bearer auth | API key never leaves server |
-| Home Page ↔ Chat Page | `<a href="/chat">` link | Standard Next.js navigation, no shared state |
+**Public API:**
+```typescript
+interface BaziCalculator {
+  computeSiZhu(birthDate: Date, birthHour: number): SiZhu;
+  computeDaYun(siZhu: SiZhu, gender: 'male' | 'female'): DaYun[];
+  computeStrength(siZhu: SiZhu): StrengthAnalysis;
+  computePattern(siZhu: SiZhu): PatternInfo;
+}
 
-## Key Technical Decisions
+interface SiZhu {
+  年柱: { gan: string; zhi: string };
+  月柱: { gan: string; zhi: string };
+  日柱: { gan: string; zhi: string };
+  时柱: { gan: string; zhi: string };
+}
+
+interface DaYun {
+  age: number;
+  ganZhi: string;
+  startYear: number;
+}
+```
+
+---
+
+## LLM Prompt Strategy
+
+**Location:** `src/lib/bazi/prompt.ts`
+
+Follow the skill's dual-report standard:
+
+```typescript
+const SYSTEM_PROMPT = `你是一个专业的八字命理分析师，使用陆致极四视角框架和韦千里八步法进行分析。...`;
+
+const professionalReportPrompt = (baziData, userProfile) => `
+[四柱信息]
+${baziData.四柱}
+
+[用户信息]
+性别: ${userProfile.gender}
+${userProfile.name ? `姓名: ${userProfile.name}` : ''}
+
+请生成专业版报告，...
+`;
+
+const plainReportPrompt = (baziData, userProfile) => `
+...
+请生成详解版报告，用通俗易懂的语言，...
+`;
+```
+
+**API call:**
+```typescript
+const result = streamText({
+  model: deepseek('deepseek-v4-flash'),
+  system: SYSTEM_PROMPT,
+  prompt: reportPrompt,
+  maxOutputTokens: 4000,
+});
+// Wait for completion, return full text (non-streaming to client)
+```
+
+---
+
+## Build Order
+
+### Phase 1: Foundation (Low Risk)
+
+1. **Calendar utility** (`src/lib/bazi/calendar.ts`)
+   - Pure function, no side effects
+   - Easy to test in isolation
+   - No UI dependencies
+
+2. **Bazi calculator** (`src/lib/bazi/calculator.ts`)
+   - Core computation logic
+   - Can be unit tested with known examples from skill doc
+   - No external dependencies
+
+3. **API route skeleton** (`src/app/api/bazi/route.ts`)
+   - Input validation
+   - Error handling
+   - Stub response until LLM integrated
+
+### Phase 2: UI Shell
+
+4. **Bazi page** (`src/app/bazi/page.tsx`)
+   - PageLayout wrapper
+   - Status state machine
+   - Form/Loading/Report conditional rendering
+
+5. **BaziForm component** (`src/components/bazi/BaziForm.tsx`)
+   - All input fields
+   - Validation
+   - Submit handler (calls API, sets status)
+
+### Phase 3: Loading & Report
+
+6. **BaziLoading component** (`src/components/bazi/BaziLoading.tsx`)
+   - Input echo display
+   - 吐槽轮播 animation
+   - 四柱 display after calculation
+
+7. **BaziReport component** (`src/components/bazi/BaziReport.tsx`)
+   - Tab switching (专业版/详解版)
+   - Scrollable content area
+   - Markdown rendering
+
+8. **HTML download** (`src/components/bazi/BaziDownload.tsx`)
+   - Download button
+   - Server-side HTML generation in API route
+
+### Phase 4: LLM Integration
+
+9. **Prompt templates** (`src/lib/bazi/prompt.ts`)
+   - System prompt
+   - Professional report prompt
+   - Plain language report prompt
+
+10. **Full API route** with LLM calls
+    - Compute Bazi
+    - Generate both reports
+    - Return combined response
+
+---
+
+## Key Design Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Streaming approach | Raw `fetch` + `ReadableStream` | No external deps. Next.js route handlers support Web Streams natively. |
-| State management | Local state via `useChat` hook | Single chat session, no persistence. No need for Zustand/Redux. |
-| DeepSeek model | `deepseek-chat` | Cheapest, fastest. Can upgrade to `deepseek-reasoner` for complex queries later. |
-| Message history | In-memory only (useState) | No persistence requirement for MVP. History lost on page refresh. |
-| Auto-scroll | `useRef` + `scrollIntoView` | Scroll to bottom on new message. Essential for chat UX. |
-
-## Sources
-
-- [Next.js Route Handler Streaming](https://nextjs.org/docs/app/api-reference/file-conventions/route#streaming) — Official docs for `ReadableStream` in route handlers
-- [Next.js Streaming Guide](https://nextjs.org/docs/app/guides/streaming) — Streaming architecture concepts
-- [DeepSeek API Docs](https://api-docs.deepseek.com/) — OpenAI-compatible chat completions API
-- Web Streams API — `ReadableStream`, `TextEncoder`, `TextDecoder` (standard browser/Node APIs)
-- Project codebase: `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/CONVENTIONS.md`
+| API streaming | Non-streaming | Long-form report, simpler error handling |
+| State management | React useState | Linear flow, no complex state sharing needed |
+| HTML generation | Server-side | Consistent styling, easier testing |
+| Calendar conversion | npm package + fallback | `lunar-converter` or similar |
+| LLM provider | DeepSeek (existing) | Same as chat feature, consistent |
+| Loading animation | Client-side timer | Independent of API latency |
 
 ---
-*Architecture research for: LLM Chat Feature (DeepSeek) in Next.js*
-*Researched: 2026-05-08*
+
+## Anti-Patterns to Avoid
+
+### Don't Reuse Chat's Streaming Pattern Directly
+
+The existing `/api/chat` route uses `streamText().toUIMessageStreamResponse()` for conversational streaming. Bazi reports are:
+- Single long response, not a back-and-forth
+- Require post-processing (dual-format splitting)
+- Need to compute Bazi before LLM call
+
+**Instead:** Use `streamText()` but await the full result before returning.
+
+### Don't Put Calendar Logic in UI Components
+
+Calendar conversion (Gregorian ↔ Lunar) is complex and testable in isolation. Keep in `src/lib/bazi/calendar.ts`, not in the Form component.
+
+### Don't Generate HTML Client-Side
+
+Client-side HTML generation leads to inconsistent styling and harder debugging. Generate on server in API route.
+
+---
+
+## Scalability Considerations
+
+| Scale | Concern | Approach |
+|-------|---------|----------|
+| 10 users/day | None | Current design handles easily |
+| 100 users/day | API rate limits | DeepSeek rate limiting awareness |
+| 1000 users/day | Cost | Token usage monitoring |
+| Concurrent requests | LLM context | Single streamText call per request |
+
+---
+
+## Confidence Assessment
+
+| Area | Confidence | Notes |
+|------|------------|-------|
+| API route design | HIGH | Clear requirements, existing patterns to follow |
+| Component structure | HIGH | Follows existing project conventions |
+| State management | HIGH | Simple linear flow, React state sufficient |
+| Calendar conversion | MEDIUM | Need to verify npm package availability |
+| LLM integration | HIGH | Same provider as existing chat feature |
+| HTML download | MEDIUM | Server-side approach, need to implement template |
+
+---
+
+## Open Questions
+
+1. **Calendar library:** Need to verify `lunar-converter` or similar package works with Next.js 16
+2. **Loading duration:** How long does LLM report generation typically take? May need skeleton screens
+3. **Error handling:** What happens if LLM fails mid-generation? Need retry logic
+4. **Download format:** User requested HTML, but skill mentions PDF. Should both be offered?
