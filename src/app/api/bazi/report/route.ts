@@ -1,5 +1,4 @@
-import { generateObject } from 'ai';
-import { z } from 'zod';
+import { generateText } from 'ai';
 import { defaultModel } from '@/lib/llm';
 import type { BirthInput } from '@/lib/bazi/types';
 import fs from 'fs';
@@ -33,8 +32,6 @@ function buildFourPillarsText(bazi: {
 十神：年干${bazi.shiShen.yearStem}、月干${bazi.shiShen.monthStem}、日干${bazi.shiShen.dayStem}、时干${bazi.shiShen.hourStem}`;
 }
 
-const contentSchema = z.object({ content: z.string() });
-
 async function generateReport(promptFile: string, fourPillarsText: string, input: BirthInput): Promise<string> {
   const prompt = fs.readFileSync(
     path.join(process.cwd(), 'src/lib/bazi/prompts', promptFile), 'utf-8'
@@ -43,14 +40,13 @@ async function generateReport(promptFile: string, fourPillarsText: string, input
     .replace('{gender}', input.gender === 'male' ? '男' : '女')
     .replace('{name}', input.name || '当事人');
 
-  const { object } = await generateObject({
+  const { text } = await generateText({
     model: defaultModel,
     prompt: filledPrompt,
-    schema: contentSchema,
     maxOutputTokens: 8000,
   });
 
-  return object.content;
+  return text.trim();
 }
 
 export async function POST(req: Request) {

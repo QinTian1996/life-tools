@@ -1,5 +1,4 @@
-import { generateObject } from 'ai';
-import { z } from 'zod';
+import { generateText } from 'ai';
 import { defaultModel } from '@/lib/llm';
 import type { BirthInput } from '@/lib/bazi/types';
 import fs from 'fs';
@@ -45,14 +44,23 @@ export async function POST(req: Request) {
       .replace('{gender}', body.gender === 'male' ? '男' : '女')
       .replace('{name}', body.name || '当事人');
 
-    const { object } = await generateObject({
+    const { text } = await generateText({
       model: defaultModel,
       prompt,
-      schema: z.object({ roasts: z.array(z.string()) }),
       maxOutputTokens: 1000,
     });
 
-    return Response.json({ roasts: object.roasts });
+    let roasts: string[] = [];
+    try {
+      const cleaned = text.trim().replace(/```json\s*|```\s*/g, '');
+      const match = cleaned.match(/\[[\s\S]*\]/);
+      roasts = match ? JSON.parse(match[0]) : JSON.parse(cleaned);
+    } catch {
+      const matches = text.match(/"([^"]+)"/g);
+      roasts = matches ? matches.map(s => s.slice(1, -1)) : [text.trim()];
+    }
+
+    return Response.json({ roasts });
   } catch (error) {
     const { error: errorMessage, code } = mapErrorToCode(error);
     return Response.json({ error: errorMessage, code }, { status: 500 });
