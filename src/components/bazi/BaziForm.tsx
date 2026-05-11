@@ -8,9 +8,11 @@ const SHICHEN_OPTIONS = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未",
 
 interface BaziFormProps {
   onCalculate: (input: BirthInput) => void;
+  isLoading?: boolean;
+  onCancel?: () => void;
 }
 
-export function BaziForm({ onCalculate }: BaziFormProps) {
+export function BaziForm({ onCalculate, isLoading = false, onCancel }: BaziFormProps) {
   const [calendarMode, setCalendarMode] = useState<CalendarMode>("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [timeMode, setTimeMode] = useState<TimeMode>("precise");
@@ -200,10 +202,16 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
         </div>
 
         <div className="relative group">
-          <Button type="submit" variant="primary" disabled={!isValid}>
-            排盘
-          </Button>
-          {failingReasons.length > 0 && (
+          {isLoading ? (
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              取消
+            </Button>
+          ) : (
+            <Button type="submit" variant="primary" disabled={!isValid}>
+              排盘
+            </Button>
+          )}
+          {failingReasons.length > 0 && !isLoading && (
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
               <div className="bg-[var(--foreground)] text-[var(--background)] text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
                 {failingReasons.map((r, i) => <div key={i}>{r}</div>)}
