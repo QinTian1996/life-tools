@@ -11,7 +11,7 @@ interface MessageListProps {
 
 export default function MessageList({ messages, isLoading }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const userScrolledUp = useRef(false);
   const prevLoading = useRef(false);
 
@@ -22,24 +22,14 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
   };
 
   const scrollToBottom = (smooth: boolean) => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+    if (smooth) {
+      sentinelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      const el = containerRef.current;
+      if (!el) return;
+      el.scrollTop = el.scrollHeight;
+    }
   };
-
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-
-    const ro = new ResizeObserver(() => {
-      if (!userScrolledUp.current) {
-        scrollToBottom(false);
-      }
-    });
-
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     if (isLoading && !prevLoading.current) {
@@ -57,6 +47,29 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
     scrollToBottom(true);
   }, [messages.length]);
 
+  useEffect(() => {
+    if (!isLoading || userScrolledUp.current) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    let raf = 0;
+    const tick = () => {
+      el.scrollTop = el.scrollHeight;
+      raf = 0;
+    };
+
+    const observer = new MutationObserver(() => {
+      if (!raf) raf = requestAnimationFrame(tick) as unknown as number;
+    });
+
+    observer.observe(el, { childList: true, subtree: true, characterData: true });
+
+    return () => {
+      observer.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isLoading]);
+
   return (
     <div
       ref={containerRef}
@@ -65,10 +78,11 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
       }}
       className="flex-1 overflow-y-auto px-4 py-4"
     >
-      <div ref={contentRef} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
+        <div ref={sentinelRef} />
 
         {isLoading && (
           <div className="flex justify-start">
