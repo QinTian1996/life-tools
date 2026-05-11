@@ -53,15 +53,21 @@ async function getRoasts(input: BirthInput, fourPillarsText: string): Promise<st
     maxOutputTokens: 1000,
   });
 
-  // Parse JSON array from response
+  // Parse JSON array from response — LLM may wrap in markdown code blocks
   try {
-    const cleaned = text.trim();
+    let cleaned = text.trim();
+    cleaned = cleaned.replace(/```json\s*/g, '').replace(/```\s*/g, '');
     const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
     return JSON.parse(cleaned);
   } catch {
+    // Last resort: split by quotes
+    const matches = text.match(/"([^"]+)"/g);
+    if (matches && matches.length > 0) {
+      return matches.map(s => s.slice(1, -1));
+    }
     return [text.trim()];
   }
 }
