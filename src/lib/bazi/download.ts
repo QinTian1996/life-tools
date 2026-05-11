@@ -52,15 +52,6 @@ export function buildDownloadTemplate(
       --border: oklch(0.92 0.02 50);
       --font-brand: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
     }
-    /* Dark mode */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --primary: oklch(0.828 0.189 84.43);
-        --foreground: oklch(0.96 0.01 50);
-        --card: oklch(0.25 0.01 50);
-        --border: oklch(0.35 0.02 50);
-      }
-    }
     /* Scoped styles matching BaziReportTab */
     .bazi-report {
       font-family: var(--font-brand);
@@ -100,11 +91,6 @@ export function buildDownloadTemplate(
     }
     .bazi-report tr:nth-child(even) {
       background: oklch(0.98 0.01 50 / 0.5);
-    }
-    @media (prefers-color-scheme: dark) {
-      .bazi-report tr:nth-child(even) {
-        background: oklch(0.25 0.01 50 / 0.5);
-      }
     }
     .bazi-report ul, .bazi-report ol {
       margin: 0.75rem 0;
