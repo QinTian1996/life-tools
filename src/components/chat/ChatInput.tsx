@@ -33,7 +33,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="border-t border-[var(--border)] p-4 bg-[var(--background)]">
+    <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-[var(--border)] p-4 bg-[var(--background)]">
       {error && (
         <div className="bg-[var(--destructive)] text-[var(--destructive-foreground)] border border-[var(--destructive)] px-4 py-2 rounded-lg mb-2 text-sm">
           {error.message || '发送失败，请重试'}
