@@ -181,25 +181,25 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-center border-t border-[var(--border)] pt-3">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)]">
-          <span className={`text-sm font-medium ${calendarMode === "solar" ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}>公历</span>
+      <div className="flex flex-wrap gap-4 items-center border-t border-[var(--border)] pt-3">
+        <div className="flex items-center gap-2">
+          <span className={`text-sm ${calendarMode === "solar" ? "text-[var(--primary)] font-medium" : "text-[var(--muted-foreground)]"}`}>公历</span>
           <button
             type="button"
             role="switch"
             aria-checked={calendarMode === "lunar"}
             onClick={() => setCalendarMode(calendarMode === "solar" ? "lunar" : "solar")}
-            className={`relative inline-block w-12 h-6 rounded-full transition-colors duration-200 ${
-              calendarMode === "lunar" ? "bg-[var(--primary)]" : "bg-[var(--muted-foreground)]"
+            className={`relative inline-block w-11 h-6 rounded-full transition-colors duration-200 ${
+              calendarMode === "lunar" ? "bg-[var(--primary)]" : "bg-[var(--secondary)]"
             }`}
           >
             <span
               className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform duration-200 shadow-sm ${
-                calendarMode === "lunar" ? "translate-x-6" : "translate-x-0"
+                calendarMode === "lunar" ? "translate-x-5" : "translate-x-0"
               }`}
             />
           </button>
-          <span className={`text-sm font-medium ${calendarMode === "lunar" ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}>农历</span>
+          <span className={`text-sm ${calendarMode === "lunar" ? "text-[var(--primary)] font-medium" : "text-[var(--muted-foreground)]"}`}>农历</span>
         </div>
 
         <div className="flex items-center rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden">
