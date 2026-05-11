@@ -25,7 +25,7 @@ export function BaziReportTab({ content, version }: BaziReportTabProps) {
 
   return (
     <div
-      className="bazi-report prose prose-sm max-w-none"
+      className="bazi-report text-[var(--foreground)] leading-relaxed space-y-4"
       dangerouslySetInnerHTML={{ __html: cleanContent }}
     />
   );
