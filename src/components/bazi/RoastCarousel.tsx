@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface RoastCarouselProps {
   roasts: string[];
@@ -10,18 +10,23 @@ interface RoastCarouselProps {
 export function RoastCarousel({ roasts, onIndexChange }: RoastCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const prevLength = useRef(0);
 
   useEffect(() => {
     if (roasts.length === 0) return;
+    if (roasts.length !== prevLength.current) {
+      prevLength.current = roasts.length;
+    }
 
     const interval = setInterval(() => {
       setIsVisible(false);
-
       setTimeout(() => {
-        const next = (currentIndex + 1) % roasts.length;
-        setCurrentIndex(next);
+        setCurrentIndex(prev => {
+          const next = (prev + 1) % roasts.length;
+          onIndexChange?.(next, roasts.length);
+          return next;
+        });
         setIsVisible(true);
-        onIndexChange?.(next, roasts.length);
       }, 500);
     }, 10000);
 
@@ -32,6 +37,8 @@ export function RoastCarousel({ roasts, onIndexChange }: RoastCarouselProps) {
     return null;
   }
 
+  const idx = currentIndex % roasts.length;
+
   return (
     <div className="relative min-h-[80px] flex items-center justify-center">
       <div
@@ -40,16 +47,14 @@ export function RoastCarousel({ roasts, onIndexChange }: RoastCarouselProps) {
       >
         <div className="text-2xl mb-2">💬</div>
         <p className="text-[var(--foreground)] italic">
-          "{roasts[currentIndex]}"
+          "{roasts[idx]}"
         </p>
         <div className="mt-2 flex justify-center gap-1.5">
           {roasts.map((_, i) => (
             <div
               key={i}
               className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                i === currentIndex
-                  ? 'bg-[var(--primary)]'
-                  : 'bg-[var(--muted-foreground)]'
+                i === idx ? 'bg-[var(--primary)]' : 'bg-[var(--muted-foreground)]'
               }`}
             />
           ))}
