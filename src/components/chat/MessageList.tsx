@@ -22,7 +22,6 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
   return (
     <div
       ref={containerRef}
-      onScroll={() => {}}
       className="flex-1 overflow-y-auto flex flex-col-reverse px-4 py-4"
     >
       <div className="flex flex-col gap-3">
