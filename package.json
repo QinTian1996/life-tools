@@ -13,6 +13,7 @@
     "@ai-sdk/react": "^3.0.178",
     "ai": "^6.0.176",
     "clsx": "^2.1.1",
+    "lunisolar": "^2.6.0",
     "lxgw-wenkai-webfont": "^1.7.0",
     "next": "16.2.6",
     "react": "19.2.4",
