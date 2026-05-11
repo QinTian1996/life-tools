@@ -96,7 +96,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
       className="space-y-4 bg-[var(--card)] rounded-lg p-6 border border-[var(--border)]"
     >
       <div className="flex flex-wrap gap-3 items-end">
-        <div className="flex-1 min-w-[80px]">
+        <div className="flex-[1.2] min-w-[90px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{yearLabel}</label>
           <input
             type="number"
