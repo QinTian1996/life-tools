@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 
 interface RoastCarouselProps {
   roasts: string[];
+  onIndexChange?: (index: number, total: number) => void;
 }
 
-export function RoastCarousel({ roasts }: RoastCarouselProps) {
+export function RoastCarousel({ roasts, onIndexChange }: RoastCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
@@ -17,8 +18,10 @@ export function RoastCarousel({ roasts }: RoastCarouselProps) {
       setIsVisible(false);
 
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % roasts.length);
+        const next = (currentIndex + 1) % roasts.length;
+        setCurrentIndex(next);
         setIsVisible(true);
+        onIndexChange?.(next, roasts.length);
       }, 500);
     }, 10000);
 

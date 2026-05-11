@@ -25,6 +25,27 @@ export default function BaziPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const fetchingRoastsRef = useRef(false);
+
+  const handleRoastRefill = useCallback(async () => {
+    if (fetchingRoastsRef.current || !currentInput) return;
+    fetchingRoastsRef.current = true;
+    try {
+      const res = await fetch('/api/bazi/roasts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentInput),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.roasts?.length) {
+          setRoasts(prev => [...prev, ...data.roasts]);
+        }
+      }
+    } finally {
+      fetchingRoastsRef.current = false;
+    }
+  }, [currentInput]);
 
   const handleCancel = useCallback(() => {
     if (abortControllerRef.current) {
@@ -158,6 +179,9 @@ export default function BaziPage() {
               baziResult={currentBazi}
               roasts={roasts}
               phase={state === 'loading-roasts' ? 'roasts' : 'report'}
+              onRoastIndexChange={(idx, total) => {
+                if (total - idx <= 4) handleRoastRefill();
+              }}
             />
           )}
 

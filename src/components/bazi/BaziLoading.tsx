@@ -9,6 +9,7 @@ interface BaziLoadingProps {
   baziResult: BaziResult;
   roasts: string[];
   phase: 'roasts' | 'report';
+  onRoastIndexChange?: (index: number, total: number) => void;
 }
 
 function formatInputSummary(input: BirthInput): string {
@@ -27,7 +28,7 @@ function formatInputSummary(input: BirthInput): string {
   return `${dateStr}${timeStr} ${genderStr}`;
 }
 
-export function BaziLoading({ input, baziResult, roasts, phase }: BaziLoadingProps) {
+export function BaziLoading({ input, baziResult, roasts, phase, onRoastIndexChange }: BaziLoadingProps) {
   return (
     <div className="space-y-6">
       <div className="text-center animate-pulse">
@@ -53,7 +54,7 @@ export function BaziLoading({ input, baziResult, roasts, phase }: BaziLoadingPro
         {phase === 'roasts' ? '正在分析命格…' : '正在生成报告…'}
       </div>
 
-      <RoastCarousel roasts={roasts} />
+      <RoastCarousel roasts={roasts} onIndexChange={onRoastIndexChange} />
     </div>
   );
 }
