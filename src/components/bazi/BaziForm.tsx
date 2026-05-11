@@ -76,7 +76,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
       className="space-y-4 bg-[var(--card)] rounded-lg p-6 border border-[var(--border)]"
     >
       <div className="flex flex-wrap gap-3 items-end">
-        <div className="flex-1 min-w-[80px]">
+        <div className="flex-1 min-w-[60px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{yearLabel}</label>
           <Input
             type="number"
@@ -90,7 +90,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
         </div>
 
         {/* Month */}
-        <div className="flex-1 min-w-[70px]">
+        <div className="flex-1 min-w-[50px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{monthLabel}</label>
           <div className="flex gap-1">
             <Input
@@ -116,7 +116,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
           </div>
         </div>
 
-        <div className="flex-1 min-w-[70px]">
+        <div className="flex-1 min-w-[50px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">{dayLabel}</label>
           <Input
             type="number"
@@ -171,7 +171,7 @@ export function BaziForm({ onCalculate }: BaziFormProps) {
           </select>
         </div>
 
-        <div className="flex-1 min-w-[100px]">
+        <div className="flex-[2] min-w-[150px]">
           <label className="block text-sm text-[var(--muted-foreground)] mb-1">姓名</label>
           <Input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="留空将自动生成" className="w-full" />
         </div>
