@@ -1,6 +1,6 @@
 import { generateObject } from 'ai';
-import { deepseek } from '@ai-sdk/deepseek';
 import { z } from 'zod';
+import { defaultModel } from '@/lib/llm';
 import type { BirthInput } from '@/lib/bazi/types';
 import fs from 'fs';
 import path from 'path';
@@ -44,7 +44,7 @@ async function generateReport(promptFile: string, fourPillarsText: string, input
     .replace('{name}', input.name || '当事人');
 
   const { object } = await generateObject({
-    model: deepseek('deepseek-v4-pro'),
+    model: defaultModel,
     prompt: filledPrompt,
     schema: contentSchema,
     maxOutputTokens: 8000,

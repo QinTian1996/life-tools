@@ -1,5 +1,5 @@
 import { streamText, type ModelMessage } from 'ai';
-import { deepseek } from '@ai-sdk/deepseek';
+import { defaultModel } from '@/lib/llm';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     const windowedMessages = messages.slice(-MAX_MESSAGES) as ModelMessage[];
 
     const result = streamText({
-      model: deepseek('deepseek-v4-flash'),
+      model: defaultModel,
       messages: windowedMessages,
       maxOutputTokens: MAX_TOKENS,
       ...(temperature !== undefined && { temperature }),
