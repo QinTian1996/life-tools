@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef } from 'react';
-import type { UIMessage, TextUIPart } from 'ai';
+import { useEffect, useRef } from 'react';
+import type { UIMessage } from 'ai';
 import MessageBubble from './MessageBubble';
 
 interface MessageListProps {
@@ -9,20 +9,17 @@ interface MessageListProps {
   isLoading: boolean;
 }
 
-function lastMessageText(messages: UIMessage[]): string {
-  if (messages.length === 0) return '';
-  const last = messages[messages.length - 1];
-  return last.parts
-    .filter((p): p is TextUIPart => p.type === 'text')
-    .map((p) => p.text)
-    .join('');
-}
-
 export default function MessageList({ messages, isLoading }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const userScrolledUp = useRef(false);
+  const prevLoading = useRef(false);
 
-  const text = lastMessageText(messages);
+  const isAtBottom = () => {
+    const el = containerRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight <= 100;
+  };
 
   const scrollToBottom = (smooth: boolean) => {
     const el = containerRef.current;
@@ -30,33 +27,45 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
     el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
   };
 
-  const handleScroll = () => {
-    const el = containerRef.current;
+  useEffect(() => {
+    const el = contentRef.current;
     if (!el) return;
-    const { scrollHeight, scrollTop, clientHeight } = el;
-    userScrolledUp.current = scrollHeight - scrollTop - clientHeight > 100;
-  };
+
+    const ro = new ResizeObserver(() => {
+      if (!userScrolledUp.current) {
+        scrollToBottom(false);
+      }
+    });
+
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
-    if (!isLoading && messages.length > 0) {
+    if (isLoading && !prevLoading.current) {
+      userScrolledUp.current = !isAtBottom();
+    }
+    if (prevLoading.current && !isLoading) {
       userScrolledUp.current = false;
       scrollToBottom(true);
     }
-  }, [messages.length]);
+    prevLoading.current = isLoading;
+  }, [isLoading]);
 
-  useLayoutEffect(() => {
-    if (isLoading && !userScrolledUp.current) {
-      scrollToBottom(false);
-    }
-  }, [text, isLoading]);
+  useEffect(() => {
+    userScrolledUp.current = false;
+    scrollToBottom(true);
+  }, [messages.length]);
 
   return (
     <div
       ref={containerRef}
-      onScroll={handleScroll}
+      onScroll={() => {
+        userScrolledUp.current = !isAtBottom();
+      }}
       className="flex-1 overflow-y-auto px-4 py-4"
     >
-      <div className="flex flex-col gap-3">
+      <div ref={contentRef} className="flex flex-col gap-3">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
@@ -65,24 +74,15 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
           <div className="flex justify-start">
             <div className="bg-[var(--secondary)] rounded-lg rounded-br-none px-4 py-3 flex gap-2 items-center">
               <span
-                style={{
-                  animation: 'bounce 1.4s infinite ease-in-out both',
-                  animationDelay: '0s',
-                }}
+                style={{ animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0s' }}
                 className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full"
               />
               <span
-                style={{
-                  animation: 'bounce 1.4s infinite ease-in-out both',
-                  animationDelay: '0.16s',
-                }}
+                style={{ animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0.16s' }}
                 className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full"
               />
               <span
-                style={{
-                  animation: 'bounce 1.4s infinite ease-in-out both',
-                  animationDelay: '0.32s',
-                }}
+                style={{ animation: 'bounce 1.4s infinite ease-in-out both', animationDelay: '0.32s' }}
                 className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full"
               />
             </div>
