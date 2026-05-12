@@ -204,7 +204,7 @@ export function BaziForm({ onCalculate, isLoading = false, onCancel }: BaziFormP
         <div className="relative group">
           {isLoading ? (
             <Button type="button" variant="secondary" onClick={onCancel}>
-              重新生成
+              重来
             </Button>
           ) : (
             <Button type="submit" variant="primary" disabled={!isValid}>
